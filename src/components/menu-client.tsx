@@ -53,55 +53,75 @@ export function MenuClient({
   return (
     <>
       {!ordersEnabled && (
-        <div className="mt-6 rounded-[var(--radius-lg)] border border-[var(--color-warning)]/40 bg-[var(--color-warning)]/10 p-4 text-sm">
+        <div className="mt-4 sm:mt-6 rounded-[var(--radius-lg)] border border-[var(--color-warning)]/40 bg-[var(--color-warning)]/10 p-3 sm:p-4 text-xs sm:text-sm">
           We&apos;re not taking orders right now. Feel free to browse — {pausedMessage}
         </div>
       )}
-      <div className="sticky top-20 z-20 -mx-4 mt-8 flex flex-wrap items-center gap-3 bg-[var(--color-background)] px-4 py-4 sm:mx-0 sm:px-0">
-        <button
-          onClick={() => setActiveCategory("all")}
-          className={`rounded-full px-4 py-2 text-sm font-medium ${
-            activeCategory === "all" ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]" : "bg-[var(--color-muted)]"
-          }`}
-        >
-          All
-        </button>
-        {categories.map((c) => (
+      <div className="sticky top-16 sm:top-20 z-20 -mx-4 mt-6 sm:mt-8 flex flex-col gap-3 border-b border-[var(--color-border)]/60 bg-[var(--color-background)]/95 px-4 py-3 backdrop-blur-md sm:mx-0 sm:border-none sm:px-0 sm:py-4">
+        {/* Horizontal Category Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           <button
-            key={c.id}
-            onClick={() => setActiveCategory(c.id)}
-            className={`rounded-full px-4 py-2 text-sm font-medium ${
-              activeCategory === c.id ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]" : "bg-[var(--color-muted)]"
+            onClick={() => setActiveCategory("all")}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-colors ${
+              activeCategory === "all" ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm" : "bg-[var(--color-muted)] hover:bg-[var(--color-secondary)]"
             }`}
           >
-            {c.name}
+            All
           </button>
-        ))}
-        <label className="ml-2 flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={vegOnly} onChange={(e) => setVegOnly(e.target.checked)} />
-          Veg only
-        </label>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as typeof sort)}
-          className="ml-auto rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
-        >
-          <option value="popularity">Popularity</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-        </select>
-        <div className="relative w-full sm:w-64">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
-          <Input placeholder="Search menu" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setActiveCategory(c.id)}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-colors ${
+                activeCategory === c.id ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm" : "bg-[var(--color-muted)] hover:bg-[var(--color-secondary)]"
+              }`}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Search & Sort Controls Row */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="relative flex-1 min-w-[140px] sm:min-w-[200px]">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
+            <Input
+              placeholder="Search bakes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 sm:h-11 pl-8 sm:pl-9 text-xs sm:text-sm"
+            />
+          </div>
+
+          <label className="flex items-center gap-1.5 rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1.5 sm:py-2 text-xs sm:text-sm cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={vegOnly}
+              onChange={(e) => setVegOnly(e.target.checked)}
+              className="h-3.5 w-3.5 rounded accent-[var(--color-success)]"
+            />
+            <span className="font-medium text-xs sm:text-sm">Veg only</span>
+          </label>
+
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as typeof sort)}
+            aria-label="Sort products"
+            className="h-9 sm:h-11 rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 sm:px-3 text-xs sm:text-sm"
+          >
+            <option value="popularity">Popularity</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="py-24 text-center text-[var(--color-muted-foreground)]">
+        <div className="py-20 sm:py-24 text-center text-sm sm:text-base text-[var(--color-muted-foreground)]">
           No products match your filters. Try clearing a filter above.
         </div>
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
           {filtered.map((p, index) => (
             <motion.div key={p.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.3) }}>
               <ProductCard product={p} available={availability[p.id] ?? 0} ordersEnabled={ordersEnabled} onBlockedAdd={() => setShowPausedModal(true)} />

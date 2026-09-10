@@ -21,30 +21,34 @@ export function ProductCard({ product, available, ordersEnabled = true, onBlocke
             sizes="(max-width: 768px) 50vw, 25vw"
           />
         )}
-        <div className="absolute left-3 top-3 flex gap-2">
-          <Badge tone="neutral">{product.code}</Badge>
-          {product.isVeg && <Badge tone="success">Veg</Badge>}
+        <div className="absolute left-2 top-2 sm:left-3 sm:top-3 flex gap-1.5 sm:gap-2">
+          <Badge tone="neutral" className="px-1.5 py-0.5 text-[10px] sm:text-xs">{product.code}</Badge>
+          {product.isVeg && <Badge tone="success" className="px-1.5 py-0.5 text-[10px] sm:text-xs">Veg</Badge>}
         </div>
         {lowStock && (
-          <div className="absolute bottom-3 left-3">
-            <Badge tone="warning">Only {available} left today</Badge>
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
+            <Badge tone="warning" className="px-1.5 py-0.5 text-[10px] sm:text-xs">Only {available} left</Badge>
           </div>
         )}
         {soldOut && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-            <Badge tone="danger">Sold out for today</Badge>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 p-2 text-center">
+            <Badge tone="danger" className="text-[10px] sm:text-xs">Sold out</Badge>
           </div>
         )}
       </div>
-      <div className="flex flex-col gap-2 p-4">
-        <h3 className="font-heading text-lg">{product.name}</h3>
-        <p className="line-clamp-2 text-sm text-[var(--color-muted-foreground)]">{product.description}</p>
-        <div className="mt-1 flex items-center justify-between">
-          <span className="text-sm text-[var(--color-muted-foreground)]">{product.weightGrams}g</span>
-          <span className="font-heading text-lg">{paiseToRupeeDisplay(product.sellingPricePaise)}</span>
+      <div className="flex flex-1 flex-col justify-between gap-2 p-3 sm:p-4">
+        <div>
+          <h3 className="font-heading text-sm sm:text-base md:text-lg leading-snug line-clamp-1 sm:line-clamp-2">{product.name}</h3>
+          <p className="mt-1 line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm text-[var(--color-muted-foreground)]">{product.description}</p>
         </div>
-        <div className="mt-2">
-          <AddToCartButton product={product} available={available} ordersEnabled={ordersEnabled} onBlockedAdd={onBlockedAdd} />
+        <div>
+          <div className="mt-1 flex items-center justify-between text-xs sm:text-sm">
+            <span className="text-[var(--color-muted-foreground)]">{product.weightGrams}g</span>
+            <span className="font-heading text-sm sm:text-base md:text-lg font-semibold">{paiseToRupeeDisplay(product.sellingPricePaise)}</span>
+          </div>
+          <div className="mt-2.5 sm:mt-3">
+            <AddToCartButton product={product} available={available} ordersEnabled={ordersEnabled} onBlockedAdd={onBlockedAdd} />
+          </div>
         </div>
       </div>
     </Card>

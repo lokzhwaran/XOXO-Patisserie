@@ -15,28 +15,28 @@ export function AddToCartButton({ product, available, ordersEnabled = true, onBl
 
   if (!ordersEnabled) {
     return (
-      <Button variant="outline" size="sm" onClick={() => onBlockedAdd?.()}>
-        Ordering paused
+      <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => onBlockedAdd?.()}>
+        Paused
       </Button>
     );
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       {!soldOut && (
-        <div className="flex items-center gap-1 rounded-full border border-[var(--color-border)] px-1">
+        <div className="flex h-8 shrink-0 items-center gap-0.5 sm:gap-1 rounded-full border border-[var(--color-border)] px-1 bg-[var(--color-surface)]">
           <button
             aria-label="Decrease"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="flex h-8 w-8 items-center justify-center"
+            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-[var(--color-muted)] transition-colors"
           >
             <Minus className="h-3 w-3" />
           </button>
-          <span className="w-5 text-center text-sm">{qty}</span>
+          <span className="w-4 sm:w-5 text-center text-xs sm:text-sm font-medium">{qty}</span>
           <button
             aria-label="Increase"
             onClick={() => setQty((q) => Math.min(available, q + 1))}
-            className="flex h-8 w-8 items-center justify-center"
+            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-[var(--color-muted)] transition-colors"
           >
             <Plus className="h-3 w-3" />
           </button>
@@ -46,6 +46,7 @@ export function AddToCartButton({ product, available, ordersEnabled = true, onBl
         variant={soldOut ? "outline" : "primary"}
         size="sm"
         disabled={soldOut}
+        className="flex-1 text-xs sm:text-sm px-2.5 sm:px-4 h-8 sm:h-9"
         onClick={() => {
           const addedQuantity = addItem({
             productId: product.id,
@@ -65,7 +66,7 @@ export function AddToCartButton({ product, available, ordersEnabled = true, onBl
           setQty(1);
         }}
       >
-        {soldOut ? "Sold out for today" : "Add to cart"}
+        {soldOut ? "Sold out" : "Add"}
       </Button>
     </div>
   );

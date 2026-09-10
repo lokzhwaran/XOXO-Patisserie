@@ -77,14 +77,14 @@ export function PaymentPanel({ orderNumber, amountPaise }: { orderNumber: string
   }
 
   return (
-    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] p-6">
+    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:p-6">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" onReady={() => setScriptReady(true)} />
-      <h2 className="font-heading text-lg">Pay {paiseToRupeeDisplay(amountPaise)}</h2>
-      <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+      <h2 className="font-heading text-lg sm:text-xl">Pay {paiseToRupeeDisplay(amountPaise)}</h2>
+      <p className="mt-2 text-xs sm:text-sm text-[var(--color-muted-foreground)] leading-relaxed">
         On mobile, UPI apps like Google Pay, PhonePe and Paytm open automatically. On desktop, scan the QR code or
         enter your UPI ID. Cards, netbanking and wallets are also supported.
       </p>
-      <Button size="lg" className="mt-6 w-full" disabled={loading || !scriptReady} onClick={startPayment}>
+      <Button size="lg" className="mt-5 sm:mt-6 w-full shadow-md" disabled={loading || !scriptReady} onClick={startPayment}>
         {loading ? "Opening payment..." : "Pay Now"}
       </Button>
       <PayLaterViaLink orderNumber={orderNumber} />
@@ -95,15 +95,22 @@ export function PaymentPanel({ orderNumber, amountPaise }: { orderNumber: string
 function PayLaterViaLink({ orderNumber }: { orderNumber: string }) {
   const [phone, setPhone] = useState("");
   return (
-    <div className="mt-6 border-t border-[var(--color-border)] pt-4">
-      <p className="text-xs text-[var(--color-muted-foreground)]">
+    <div className="mt-5 sm:mt-6 border-t border-[var(--color-border)] pt-4">
+      <p className="text-xs text-[var(--color-muted-foreground)] leading-relaxed">
         Prefer to pay later? We&apos;ll text a payment link for order {orderNumber} to your phone.
       </p>
-      <div className="mt-2 flex gap-2">
-        <Input placeholder="Your phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+      <div className="mt-2.5 flex flex-col sm:flex-row gap-2">
+        <Input placeholder="Your phone number" type="tel" inputMode="numeric" value={phone} onChange={(e) => setPhone(e.target.value)} className="flex-1" />
         <Button
           variant="outline"
-          onClick={() => toast.success("A payment link will be sent to your phone shortly.")}
+          className="shrink-0"
+          onClick={() => {
+            if (phone.length < 10) {
+              toast.error("Please enter a valid phone number");
+              return;
+            }
+            toast.success("A payment link will be sent to your phone shortly.");
+          }}
         >
           Send link
         </Button>

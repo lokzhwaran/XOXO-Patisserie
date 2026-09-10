@@ -44,61 +44,73 @@ export default function CartPage() {
   const belowMin = settings ? total < settings.minOrderValuePaise && items.length > 0 : false;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="font-heading text-4xl">Your Cart</h1>
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
+      <h1 className="font-heading text-3xl sm:text-4xl">Your Cart</h1>
 
       {items.length === 0 ? (
-        <div className="mt-16 flex flex-col items-center gap-4 text-center">
+        <div className="mt-12 sm:mt-16 flex flex-col items-center gap-4 text-center">
           <p className="text-[var(--color-muted-foreground)]">Your cart is empty.</p>
           <Button asChild variant="primary">
             <Link href="/menu">Browse the menu</Link>
           </Button>
         </div>
       ) : (
-        <div className="mt-8 grid gap-8 md:grid-cols-3">
+        <div className="mt-6 sm:mt-8 grid gap-6 sm:gap-8 md:grid-cols-3">
           <div className="md:col-span-2">
             <Card>
               <CardContent className="flex flex-col divide-y divide-[var(--color-border)] p-0">
                 {items.map((item) => (
-                  <div key={`${item.productId}-${item.variantId}`} className="flex items-center gap-4 p-4">
-                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-[var(--radius-base)] bg-[var(--color-muted)]">
-                      {item.image && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-xs text-[var(--color-muted-foreground)]">{item.code}</p>
-                      <p className="mt-1 text-sm">{paiseToRupeeDisplay(item.unitPricePaise)} each</p>
-                    </div>
-                    <div className="flex items-center gap-2">
+                  <div key={`${item.productId}-${item.variantId}`} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3.5 sm:p-4">
+                    <div className="flex items-start gap-3 sm:contents">
+                      <div className="h-16 w-16 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-[var(--radius-base)] bg-[var(--color-muted)]">
+                        {item.image && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm sm:text-base leading-snug">{item.name}</p>
+                        <p className="text-xs text-[var(--color-muted-foreground)]">{item.code}</p>
+                        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-[var(--color-muted-foreground)]">{paiseToRupeeDisplay(item.unitPricePaise)} each</p>
+                      </div>
                       <button
-                        aria-label="Decrease"
-                        onClick={() => setQuantity(item.productId, item.variantId, item.quantity - 1)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)]"
+                        aria-label="Remove item"
+                        onClick={() => removeItem(item.productId, item.variantId)}
+                        className="p-1 sm:hidden text-[var(--color-muted-foreground)] hover:text-[var(--color-danger)] transition-colors"
                       >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="w-5 text-center">{item.quantity}</span>
-                      <button
-                        aria-label="Increase"
-                        onClick={() => setQuantity(item.productId, item.variantId, item.quantity + 1)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)]"
-                      >
-                        <Plus className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
-                    <p className="w-24 text-right font-medium">
-                      {paiseToRupeeDisplay(item.unitPricePaise * item.quantity)}
-                    </p>
-                    <button
-                      aria-label="Remove"
-                      onClick={() => removeItem(item.productId, item.variantId)}
-                      className="text-[var(--color-muted-foreground)] hover:text-[var(--color-danger)]"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+
+                    <div className="flex items-center justify-between sm:gap-4 pt-1 sm:pt-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <button
+                          aria-label="Decrease quantity"
+                          onClick={() => setQuantity(item.productId, item.variantId, item.quantity - 1)}
+                          className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] active:scale-95"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="w-5 text-center text-sm font-medium">{item.quantity}</span>
+                        <button
+                          aria-label="Increase quantity"
+                          onClick={() => setQuantity(item.productId, item.variantId, item.quantity + 1)}
+                          className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] active:scale-95"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+                      <p className="text-right font-medium text-sm sm:text-base sm:w-24">
+                        {paiseToRupeeDisplay(item.unitPricePaise * item.quantity)}
+                      </p>
+                      <button
+                        aria-label="Remove item"
+                        onClick={() => removeItem(item.productId, item.variantId)}
+                        className="hidden sm:inline-flex text-[var(--color-muted-foreground)] hover:text-[var(--color-danger)] transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -107,7 +119,7 @@ export default function CartPage() {
 
           <div>
             <Card>
-              <CardContent className="flex flex-col gap-3">
+              <CardContent className="flex flex-col gap-3 p-4 sm:p-5">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
                   <span>{paiseToRupeeDisplay(subtotal)}</span>
