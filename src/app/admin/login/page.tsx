@@ -10,8 +10,8 @@ import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@bakery.local");
-  const [password, setPassword] = useState("Admin@12345");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -58,8 +58,7 @@ export default function AdminLoginPage() {
             </Button>
           </form>
           <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
-            Sandbox credentials (seeded by <code>pnpm setup</code>): admin@bakery.local / Admin@12345 (OWNER),
-            manager@bakery.local / Manager@12345 (MANAGER), staff@bakery.local / Staff@12345 (STAFF).
+            Use the admin credentials configured for this environment.
           </p>
         </CardContent>
       </Card>

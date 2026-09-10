@@ -1,13 +1,20 @@
 import { PrismaClient, ExpenseCategory, OrderStatus, PaymentStatus, FulfilmentType } from "@prisma/client";
 import { addDays, subDays, format } from "date-fns";
+import { existsSync } from "fs";
+import path from "path";
 import { DEFAULT_THEME } from "../src/lib/theme";
 import { hashPassword } from "../src/lib/providers/auth/sandbox";
+
+const envPath = path.join(process.cwd(), ".env");
+if (existsSync(envPath)) process.loadEnvFile(envPath);
 
 const prisma = new PrismaClient();
 const isMinimal = process.argv.includes("--minimal");
 const ORDER_COUNT = isMinimal ? 5 : 40;
 const EXPENSE_COUNT = isMinimal ? 3 : 20;
 const SEED_RUN_ID = `${Date.now()}`.slice(-6);
+const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "admin@bakery.local";
+const adminPassword = process.env.ADMIN_PASSWORD || "Admin@12345";
 
 const CATEGORIES = [
   { name: "Brownies", slug: "brownies", sortOrder: 0 },
@@ -416,7 +423,7 @@ async function main() {
   }
 
   const seededAccounts = [
-    { email: "admin@bakery.local", name: "Bakery Owner", role: "OWNER", password: "Admin@12345" },
+    { email: adminEmail, name: "Bakery Owner", role: "OWNER", password: adminPassword },
     { email: "manager@bakery.local", name: "Store Manager", role: "MANAGER", password: "Manager@12345" },
     { email: "staff@bakery.local", name: "Kitchen Staff", role: "STAFF", password: "Staff@12345" },
   ];

@@ -43,10 +43,12 @@ function persistDatabaseUrl(databaseUrl: string) {
 }
 
 function printCredentialsTable() {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "admin@bakery.local";
+  const adminPassword = process.env.ADMIN_PASSWORD || "Admin@12345";
   console.log("Seeded admin accounts (sandbox credentials auth — no external account needed):\n");
   console.log("| Role    | Email                  | Password       |");
   console.log("|---------|------------------------|----------------|");
-  console.log("| OWNER   | admin@bakery.local     | Admin@12345    |");
+  console.log(`| OWNER   | ${adminEmail.padEnd(22)} | ${adminPassword.padEnd(14)} |`);
   console.log("| MANAGER | manager@bakery.local   | Manager@12345  |");
   console.log("| STAFF   | staff@bakery.local     | Staff@12345    |");
   console.log("\nLog in at http://localhost:3000/admin/login\n");
