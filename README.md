@@ -18,7 +18,7 @@ Framer Motion · Recharts.
 
 ## 1. Prerequisites
 
-- Node.js 20+ and pnpm (`corepack enable` or `npm i -g pnpm`)
+- Node.js 22+ and pnpm (`corepack enable` or `npm i -g pnpm`)
 - Docker (for local Postgres) **or** a Supabase project
 - A Razorpay account (test mode is free) for payments
 - Optional for full functionality: a Meta WhatsApp Cloud API app, a Resend account, a Porter

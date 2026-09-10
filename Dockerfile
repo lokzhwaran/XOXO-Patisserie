@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Prisma's query engine needs openssl on Alpine; libc6-compat covers other native deps.
 RUN apk add --no-cache openssl libc6-compat
