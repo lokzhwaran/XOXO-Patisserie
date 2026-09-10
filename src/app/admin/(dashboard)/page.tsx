@@ -49,41 +49,41 @@ export default async function AdminDashboardPage({ searchParams }: { searchParam
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-2xl">Dashboard</h1>
+        <h1 className="font-heading text-xl sm:text-2xl">Dashboard</h1>
         <DateRangeFilter basePath="/admin" activeRange={customRange ? null : rangeKey} from={params.from ?? ""} to={params.to ?? ""} />
       </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
         {kpis.map((k) => (
           <Card key={k.label}>
-            <CardContent>
-              <p className="text-xs text-[var(--color-muted-foreground)]">{k.label}</p>
-              <p className="mt-1 font-heading text-2xl">{k.value}</p>
+            <CardContent className="p-3.5 sm:p-5">
+              <p className="text-[11px] sm:text-xs text-[var(--color-muted-foreground)] leading-tight">{k.label}</p>
+              <p className="mt-1 font-heading text-lg sm:text-2xl font-semibold">{k.value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-3">
+        <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
           <div>
-            <h2 className="font-heading text-lg">Ordering</h2>
-            <p className="text-sm text-[var(--color-muted-foreground)]">Instantly pause or resume customer ordering site-wide.</p>
+            <h2 className="font-heading text-base sm:text-lg">Ordering</h2>
+            <p className="text-xs sm:text-sm text-[var(--color-muted-foreground)]">Instantly pause or resume customer ordering site-wide.</p>
           </div>
           <AdminOrderingToggle initialEnabled={settings?.ordersEnabled ?? true} />
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid gap-4 sm:gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <Card>
-          <CardContent>
-            <h2 className="font-heading text-lg">Orders by Status</h2>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <CardContent className="p-4 sm:p-5">
+            <h2 className="font-heading text-base sm:text-lg">Orders by Status</h2>
+            <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-4">
               {statusCounts.map((s) => (
-                <div key={s.status} className="rounded-[var(--radius-base)] bg-[var(--color-muted)] p-3 text-center transition-colors">
-                  <p className="text-xs text-[var(--color-muted-foreground)]">{s.status}</p>
-                  <p className="font-heading text-xl">{s._count.status}</p>
+                <div key={s.status} className="rounded-[var(--radius-base)] bg-[var(--color-muted)] p-2.5 sm:p-3 text-center transition-colors">
+                  <p className="text-[10px] sm:text-xs text-[var(--color-muted-foreground)] truncate">{s.status}</p>
+                  <p className="font-heading text-base sm:text-xl font-semibold">{s._count.status}</p>
                 </div>
               ))}
             </div>
@@ -91,18 +91,18 @@ export default async function AdminDashboardPage({ searchParams }: { searchParam
         </Card>
 
         <Card>
-          <CardContent>
-            <h2 className="font-heading text-lg">Recent Orders</h2>
-            <div className="mt-4 space-y-3">
+          <CardContent className="p-4 sm:p-5">
+            <h2 className="font-heading text-base sm:text-lg">Recent Orders</h2>
+            <div className="mt-3 sm:mt-4 space-y-2.5 sm:space-y-3">
               {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between gap-3 rounded-[var(--radius-base)] bg-[var(--color-muted)] p-3 transition-colors">
-                  <div>
-                    <p className="font-medium">{order.orderNumber}</p>
-                    <p className="text-xs text-[var(--color-muted-foreground)]">{order.customer.name}</p>
+                <div key={order.id} className="flex items-center justify-between gap-3 rounded-[var(--radius-base)] bg-[var(--color-muted)] p-2.5 sm:p-3 transition-colors text-xs sm:text-sm">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{order.orderNumber}</p>
+                    <p className="text-[11px] sm:text-xs text-[var(--color-muted-foreground)] truncate">{order.customer.name}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <p className="font-medium">{paiseToRupeeDisplay(order.totalPaise)}</p>
-                    <p className="text-xs text-[var(--color-muted-foreground)]">{format(order.createdAt, "d MMM")}</p>
+                    <p className="text-[11px] sm:text-xs text-[var(--color-muted-foreground)]">{format(order.createdAt, "d MMM")}</p>
                   </div>
                 </div>
               ))}

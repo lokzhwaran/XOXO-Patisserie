@@ -42,23 +42,26 @@ export default async function AdminSystemPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-heading text-2xl">System</h1>
-      <p className="text-sm text-[var(--color-muted-foreground)]">
-        Current mode: <Badge tone={mode === "sandbox" ? "warning" : "success"}>{mode.toUpperCase()}</Badge>
-      </p>
+      <div>
+        <h1 className="font-heading text-xl sm:text-2xl">System</h1>
+        <p className="mt-1 text-xs sm:text-sm text-[var(--color-muted-foreground)] flex items-center gap-2">
+          <span>Current mode:</span>
+          <Badge tone={mode === "sandbox" ? "warning" : "success"} className="text-xs">{mode.toUpperCase()}</Badge>
+        </p>
+      </div>
       <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b border-[var(--color-border)] text-left text-xs uppercase text-[var(--color-muted-foreground)]">
-            <tr><th className="p-3">Integration</th><th className="p-3">Configured</th><th className="p-3">Last call</th></tr>
+        <table className="w-full min-w-[480px] text-xs sm:text-sm">
+          <thead className="border-b border-[var(--color-border)] text-left text-[11px] sm:text-xs uppercase text-[var(--color-muted-foreground)]">
+            <tr><th className="p-2.5 sm:p-3">Integration</th><th className="p-2.5 sm:p-3">Configured</th><th className="p-2.5 sm:p-3">Last call</th></tr>
           </thead>
           <tbody>
             {integrations.map((i) => (
-              <tr key={i.name} className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-muted)]">
-                <td className="p-3">{i.name}</td>
-                <td className="p-3">
-                  <Badge tone={i.configured ? "success" : "neutral"}>{i.configured ? "Yes" : "Not configured (sandbox active)"}</Badge>
+              <tr key={i.name} className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-muted)] transition-colors">
+                <td className="p-2.5 sm:p-3 font-medium">{i.name}</td>
+                <td className="p-2.5 sm:p-3">
+                  <Badge tone={i.configured ? "success" : "neutral"} className="text-[10px] sm:text-xs">{i.configured ? "Yes" : "Not configured (sandbox active)"}</Badge>
                 </td>
-                <td className="p-3 text-xs text-[var(--color-muted-foreground)]">
+                <td className="p-2.5 sm:p-3 text-[11px] sm:text-xs text-[var(--color-muted-foreground)]">
                   {i.lastCall ? new Date(i.lastCall).toLocaleString() : "—"}
                 </td>
               </tr>

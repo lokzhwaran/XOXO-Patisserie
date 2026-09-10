@@ -35,12 +35,12 @@ export function DateRangeFilter({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="flex gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] p-1 text-sm">
+      <div className="flex items-center gap-0.5 sm:gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] p-0.5 sm:p-1 text-xs sm:text-sm">
         {PRESETS.map((preset) => (
           <a
             key={preset.key}
             href={`${basePath}?range=${preset.key}`}
-            className={`rounded-full px-3 py-1 transition-colors ${!customOpen && activeRange === preset.key ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]" : "hover:bg-[var(--color-muted)]"}`}
+            className={`rounded-full px-2 sm:px-3 py-1 transition-colors font-medium ${!customOpen && activeRange === preset.key ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-xs" : "hover:bg-[var(--color-muted)]"}`}
           >
             {preset.label}
           </a>
@@ -48,17 +48,17 @@ export function DateRangeFilter({
         <button
           type="button"
           onClick={() => setCustomOpen((open) => !open)}
-          className={`rounded-full px-3 py-1 transition-colors ${customOpen ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]" : "hover:bg-[var(--color-muted)]"}`}
+          className={`rounded-full px-2 sm:px-3 py-1 transition-colors font-medium ${customOpen ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-xs" : "hover:bg-[var(--color-muted)]"}`}
         >
           Calendar
         </button>
       </div>
       {customOpen && (
-        <div className="flex flex-wrap items-center gap-2">
-          <Input aria-label="From date" type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9 w-auto" />
-          <span className="text-sm text-[var(--color-muted-foreground)]">to</span>
-          <Input aria-label="To date" type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9 w-auto" />
-          <Button size="sm" disabled={!fromDate || !toDate} onClick={applyCustomRange}>Apply</Button>
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <Input aria-label="From date" type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-8 sm:h-9 w-auto text-xs sm:text-sm" />
+          <span className="text-xs text-[var(--color-muted-foreground)]">to</span>
+          <Input aria-label="To date" type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-8 sm:h-9 w-auto text-xs sm:text-sm" />
+          <Button size="sm" className="h-8 sm:h-9 text-xs" disabled={!fromDate || !toDate} onClick={applyCustomRange}>Apply</Button>
         </div>
       )}
     </div>

@@ -80,43 +80,57 @@ export function MenuEditor({ products, categories }: { products: MenuProduct[]; 
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm md:grid-cols-4 lg:grid-cols-8 lg:items-end">
-        {(["name", "code", "sellingPriceRupees", "costOfMakingRupees", "weekdayMax", "weekendMax", "weightGrams"] as const).map((field) => <div key={field}><Label htmlFor={`new-${field}`}>{field === "name" ? "Name" : field === "code" ? "Code" : field === "sellingPriceRupees" ? "Price (₹)" : field === "costOfMakingRupees" ? "Cost (₹)" : field === "weekdayMax" ? "Weekday limit" : field === "weekendMax" ? "Weekend limit" : "Weight (g)"}</Label><Input id={`new-${field}`} type={field === "name" || field === "code" ? "text" : "number"} min="0" value={newProduct[field]} onChange={(e) => setNewProduct({ ...newProduct, [field]: e.target.value })} /></div>)}
-        <div><Label htmlFor="new-category">Category</Label><select id="new-category" value={newProduct.categoryId} onChange={(e) => setNewProduct({ ...newProduct, categoryId: e.target.value })} className="h-10 w-full rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm">{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></div>
-        <Button disabled={saving === "new"} onClick={addProduct}>{saving === "new" ? "Adding..." : "Add menu item"}</Button>
+      <div className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 sm:p-4 shadow-sm sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 lg:items-end">
+        {(["name", "code", "sellingPriceRupees", "costOfMakingRupees", "weekdayMax", "weekendMax", "weightGrams"] as const).map((field) => (
+          <div key={field}>
+            <Label htmlFor={`new-${field}`} className="text-xs sm:text-sm">
+              {field === "name" ? "Name" : field === "code" ? "Code" : field === "sellingPriceRupees" ? "Price (₹)" : field === "costOfMakingRupees" ? "Cost (₹)" : field === "weekdayMax" ? "Weekday limit" : field === "weekendMax" ? "Weekend limit" : "Weight (g)"}
+            </Label>
+            <Input id={`new-${field}`} type={field === "name" || field === "code" ? "text" : "number"} min="0" value={newProduct[field]} onChange={(e) => setNewProduct({ ...newProduct, [field]: e.target.value })} className="h-9 sm:h-10 text-xs sm:text-sm" />
+          </div>
+        ))}
+        <div>
+          <Label htmlFor="new-category" className="text-xs sm:text-sm">Category</Label>
+          <select id="new-category" value={newProduct.categoryId} onChange={(e) => setNewProduct({ ...newProduct, categoryId: e.target.value })} className="h-9 sm:h-10 w-full rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 sm:px-3 text-xs sm:text-sm text-[var(--color-foreground)]">
+            {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+          </select>
+        </div>
+        <Button disabled={saving === "new"} onClick={addProduct} className="h-9 sm:h-10 text-xs sm:text-sm sm:col-span-2 md:col-span-4 lg:col-span-8">
+          {saving === "new" ? "Adding..." : "Add menu item"}
+        </Button>
       </div>
       {rows.map((product) => (
-        <div key={product.id} className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm lg:grid-cols-[1.4fr_1fr_0.8fr_0.8fr_0.9fr_auto] lg:items-end">
+        <div key={product.id} className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 sm:p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_0.8fr_0.8fr_0.9fr_auto] lg:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase text-[var(--color-muted-foreground)]">{product.code}</p>
-            <Label htmlFor={`name-${product.id}`}>Menu item</Label>
-            <Input id={`name-${product.id}`} value={product.name} onChange={(e) => update(product.id, { name: e.target.value })} />
+            <p className="text-[10px] sm:text-xs font-semibold uppercase text-[var(--color-muted-foreground)]">{product.code}</p>
+            <Label htmlFor={`name-${product.id}`} className="text-xs sm:text-sm">Menu item</Label>
+            <Input id={`name-${product.id}`} value={product.name} onChange={(e) => update(product.id, { name: e.target.value })} className="h-9 sm:h-10 text-xs sm:text-sm" />
           </div>
           <div>
-            <Label htmlFor={`category-${product.id}`}>Category</Label>
-            <select id={`category-${product.id}`} value={product.categoryId} onChange={(e) => update(product.id, { categoryId: e.target.value })} className="h-10 w-full rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm">
+            <Label htmlFor={`category-${product.id}`} className="text-xs sm:text-sm">Category</Label>
+            <select id={`category-${product.id}`} value={product.categoryId} onChange={(e) => update(product.id, { categoryId: e.target.value })} className="h-9 sm:h-10 w-full rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 sm:px-3 text-xs sm:text-sm text-[var(--color-foreground)]">
               {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
             </select>
           </div>
           {(["sellingPricePaise", "costOfMakingPaise"] as const).map((field) => (
             <div key={field}>
-              <Label htmlFor={`${field}-${product.id}`}>{field === "sellingPricePaise" ? "Price (₹)" : "Cost (₹)"}</Label>
-              <Input id={`${field}-${product.id}`} type="number" min="0" step="0.01" value={product[field] / 100} onChange={(e) => update(product.id, { [field]: Number(e.target.value) * 100 })} />
+              <Label htmlFor={`${field}-${product.id}`} className="text-xs sm:text-sm">{field === "sellingPricePaise" ? "Price (₹)" : "Cost (₹)"}</Label>
+              <Input id={`${field}-${product.id}`} type="number" min="0" step="0.01" value={product[field] / 100} onChange={(e) => update(product.id, { [field]: Number(e.target.value) * 100 })} className="h-9 sm:h-10 text-xs sm:text-sm" />
             </div>
           ))}
-          <div className="flex items-center gap-3 text-sm lg:flex-col lg:items-start">
-            <label><input type="checkbox" checked={product.isActive} onChange={(e) => update(product.id, { isActive: e.target.checked })} /> Active</label>
-            <label><input type="checkbox" checked={product.isFeatured} onChange={(e) => update(product.id, { isFeatured: e.target.checked })} /> Featured</label>
+          <div className="flex items-center gap-4 text-xs sm:text-sm sm:col-span-2 lg:col-span-1 lg:flex-col lg:items-start lg:gap-1.5">
+            <label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={product.isActive} onChange={(e) => update(product.id, { isActive: e.target.checked })} className="accent-[var(--color-primary)] rounded" /> Active</label>
+            <label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={product.isFeatured} onChange={(e) => update(product.id, { isFeatured: e.target.checked })} className="accent-[var(--color-primary)] rounded" /> Featured</label>
           </div>
-          <div className="flex flex-col gap-2">
-            <Button size="sm" disabled={saving === product.id} onClick={() => save(product)}>{saving === product.id ? "Saving..." : "Save"}</Button>
-            <Button asChild size="sm" variant="outline"><Link href={`/admin/menu/capacity?product=${product.id}`}>Set capacity by date</Link></Button>
+          <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
+            <Button size="sm" disabled={saving === product.id} onClick={() => save(product)} className="h-8 sm:h-9 text-xs sm:text-sm">{saving === product.id ? "Saving..." : "Save"}</Button>
+            <Button asChild size="sm" variant="outline" className="h-8 sm:h-9 text-xs"><Link href={`/admin/menu/capacity?product=${product.id}`}>Set capacity by date</Link></Button>
             <div className="flex flex-col gap-1">
-              <Button size="sm" variant="outline" onClick={() => removeProduct(product)}>Remove from menu</Button>
+              <Button size="sm" variant="outline" onClick={() => removeProduct(product)} className="h-8 sm:h-9 text-xs">Remove from menu</Button>
               {product.hasOrders ? (
-                <span className="text-xs text-[var(--color-muted-foreground)]" title="This item has past orders, so its order history can't be deleted. Use 'Remove from menu' above to take it off the customer menu instead.">Has past orders — use &quot;Remove from menu&quot; above, not delete</span>
+                <span className="text-[11px] text-[var(--color-muted-foreground)]" title="This item has past orders, so its order history can't be deleted. Use 'Remove from menu' above to take it off the customer menu instead.">Has past orders — use &quot;Remove from menu&quot; above</span>
               ) : (
-                <Button size="sm" variant="danger" onClick={() => deleteProduct(product)}>Delete permanently</Button>
+                <Button size="sm" variant="danger" onClick={() => deleteProduct(product)} className="h-8 sm:h-9 text-xs">Delete permanently</Button>
               )}
             </div>
           </div>

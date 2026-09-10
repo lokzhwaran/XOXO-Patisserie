@@ -58,9 +58,9 @@ export default async function AdminOrdersPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="font-heading text-2xl">Orders</h1>
-        <Button asChild variant="outline" size="sm"><a href="/api/admin/orders/export">Export CSV</a></Button>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="font-heading text-xl sm:text-2xl">Orders</h1>
+        <Button asChild variant="outline" size="sm" className="h-8 sm:h-9 text-xs sm:text-sm"><a href="/api/admin/orders/export">Export CSV</a></Button>
       </div>
 
       <OrderFilters
@@ -73,16 +73,16 @@ export default async function AdminOrdersPage({
       />
 
       <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[600px] text-xs sm:text-sm">
           <thead className="border-b border-[var(--color-border)] text-left text-xs uppercase text-[var(--color-muted-foreground)]">
             <tr>
-              <th className="p-3">Order</th>
-              <th className="p-3">Customer</th>
-              <th className="p-3">Items</th>
-              <th className="p-3">Total</th>
-              <th className="p-3">Payment</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Date</th>
+              <th className="p-2.5 sm:p-3">Order</th>
+              <th className="p-2.5 sm:p-3">Customer</th>
+              <th className="p-2.5 sm:p-3">Items</th>
+              <th className="p-2.5 sm:p-3">Total</th>
+              <th className="p-2.5 sm:p-3">Payment</th>
+              <th className="p-2.5 sm:p-3">Status</th>
+              <th className="p-2.5 sm:p-3">Date</th>
             </tr>
           </thead>
           <tbody>
@@ -90,26 +90,26 @@ export default async function AdminOrdersPage({
               <tr><td colSpan={7} className="p-6 text-center text-[var(--color-muted-foreground)]">No orders match these filters.</td></tr>
             ) : orders.map((order) => (
               <tr key={order.id} className="border-b border-[var(--color-border)] last:border-0 transition-colors hover:bg-[var(--color-muted)]">
-                <td className="p-3">
-                  <Link href={`/admin/orders/${order.orderNumber}`} className="font-medium text-[var(--color-primary)]">
+                <td className="p-2.5 sm:p-3">
+                  <Link href={`/admin/orders/${order.orderNumber}`} className="font-medium text-[var(--color-primary)] hover:underline">
                     {order.orderNumber}
                   </Link>
                 </td>
-                <td className="p-3">
-                  {order.customer.name}
-                  <div className="text-xs text-[var(--color-muted-foreground)]">{order.customer.phone}</div>
+                <td className="p-2.5 sm:p-3">
+                  <div className="font-medium">{order.customer.name}</div>
+                  <div className="text-[11px] text-[var(--color-muted-foreground)]">{order.customer.phone}</div>
                 </td>
-                <td className="p-3">{order.items.length} item(s)</td>
-                <td className="p-3">{paiseToRupeeDisplay(order.totalPaise)}</td>
-                <td className="p-3">
-                  <Badge tone={order.paymentStatus === "PAID" ? "success" : order.paymentStatus === "FAILED" ? "danger" : "warning"}>
+                <td className="p-2.5 sm:p-3">{order.items.length} item(s)</td>
+                <td className="p-2.5 sm:p-3 font-medium">{paiseToRupeeDisplay(order.totalPaise)}</td>
+                <td className="p-2.5 sm:p-3">
+                  <Badge tone={order.paymentStatus === "PAID" ? "success" : order.paymentStatus === "FAILED" ? "danger" : "warning"} className="text-[10px] sm:text-xs">
                     {order.paymentStatus}
                   </Badge>
                 </td>
-                <td className="p-3">
-                  <Badge tone="neutral">{order.status}</Badge>
+                <td className="p-2.5 sm:p-3">
+                  <Badge tone="neutral" className="text-[10px] sm:text-xs">{order.status}</Badge>
                 </td>
-                <td className="p-3 text-xs text-[var(--color-muted-foreground)]">
+                <td className="p-2.5 sm:p-3 text-[11px] sm:text-xs text-[var(--color-muted-foreground)] whitespace-nowrap">
                   {format(order.createdAt, "d MMM, h:mm a")}
                 </td>
               </tr>
@@ -117,11 +117,11 @@ export default async function AdminOrdersPage({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between text-sm text-[var(--color-muted-foreground)]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-[var(--color-muted-foreground)]">
         <span>Page {page} of {totalPages} · {total} orders</span>
-        <div className="flex gap-2">
-          {page > 1 && <Button asChild variant="outline" size="sm"><Link href={`/admin/orders?${new URLSearchParams({ ...filterParams, page: String(page - 1) }).toString()}`}>Previous</Link></Button>}
-          {page < totalPages && <Button asChild variant="outline" size="sm"><Link href={`/admin/orders?${new URLSearchParams({ ...filterParams, page: String(page + 1) }).toString()}`}>Next</Link></Button>}
+        <div className="flex gap-2 w-full sm:w-auto">
+          {page > 1 && <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none"><Link href={`/admin/orders?${new URLSearchParams({ ...filterParams, page: String(page - 1) }).toString()}`}>Previous</Link></Button>}
+          {page < totalPages && <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none"><Link href={`/admin/orders?${new URLSearchParams({ ...filterParams, page: String(page + 1) }).toString()}`}>Next</Link></Button>}
         </div>
       </div>
     </div>

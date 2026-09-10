@@ -12,20 +12,20 @@ export function ProductProfitabilityTable({ rows }: { rows: ProductRow[] }) {
 
   return (
     <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-      <table className="w-full text-sm">
-        <thead className="border-b border-[var(--color-border)] text-left text-xs uppercase text-[var(--color-muted-foreground)]">
-          <tr><th className="p-3">Product</th><th className="p-3">Units</th><th className="p-3">Revenue</th><th className="p-3">Cost</th><th className="p-3">Profit</th></tr>
+      <table className="w-full min-w-[480px] text-xs sm:text-sm">
+        <thead className="border-b border-[var(--color-border)] text-left text-[11px] sm:text-xs uppercase text-[var(--color-muted-foreground)]">
+          <tr><th className="p-2.5 sm:p-3">Product</th><th className="p-2.5 sm:p-3">Units</th><th className="p-2.5 sm:p-3">Revenue</th><th className="p-2.5 sm:p-3">Cost</th><th className="p-2.5 sm:p-3">Profit</th></tr>
         </thead>
         <tbody>
           {rows.length === 0 ? (
             <tr><td colSpan={5} className="p-6 text-center text-[var(--color-muted-foreground)]">No paid orders in this range.</td></tr>
           ) : visible.map((p) => (
             <tr key={p.code} className="border-b border-[var(--color-border)] last:border-0 transition-colors hover:bg-[var(--color-muted)]">
-              <td className="p-3">{p.name} ({p.code})</td>
-              <td className="p-3">{p.units}</td>
-              <td className="p-3">{paiseToRupeeDisplay(p.revenue)}</td>
-              <td className="p-3">{paiseToRupeeDisplay(p.cost)}</td>
-              <td className="p-3">{paiseToRupeeDisplay(p.profit)}</td>
+              <td className="p-2.5 sm:p-3 font-medium">{p.name} ({p.code})</td>
+              <td className="p-2.5 sm:p-3">{p.units}</td>
+              <td className="p-2.5 sm:p-3">{paiseToRupeeDisplay(p.revenue)}</td>
+              <td className="p-2.5 sm:p-3">{paiseToRupeeDisplay(p.cost)}</td>
+              <td className="p-2.5 sm:p-3 font-semibold text-[var(--color-success)]">{paiseToRupeeDisplay(p.profit)}</td>
             </tr>
           ))}
         </tbody>

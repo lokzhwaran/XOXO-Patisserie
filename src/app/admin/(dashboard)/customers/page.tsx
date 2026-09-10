@@ -27,36 +27,39 @@ export default async function AdminCustomersPage({ searchParams }: { searchParam
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between"><h1 className="font-heading text-2xl">Customers</h1><Button asChild variant="outline" size="sm"><a href="/api/admin/customers/export">Export CSV</a></Button></div>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="font-heading text-xl sm:text-2xl">Customers</h1>
+        <Button asChild variant="outline" size="sm" className="h-8 sm:h-9 text-xs sm:text-sm"><a href="/api/admin/customers/export">Export CSV</a></Button>
+      </div>
       <form className="max-w-sm" action="/admin/customers" method="GET">
-        <Input name="search" defaultValue={search} placeholder="Search name or phone" />
+        <Input name="search" defaultValue={search} placeholder="Search name or phone..." className="h-9 sm:h-10 text-xs sm:text-sm" />
       </form>
       <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b border-[var(--color-border)] text-left text-xs uppercase text-[var(--color-muted-foreground)]">
-            <tr><th className="p-3">Name</th><th className="p-3">Phone</th><th className="p-3">Orders</th><th className="p-3">Lifetime Value</th><th className="p-3">Last Order</th><th className="p-3">Action</th></tr>
+        <table className="w-full min-w-[550px] text-xs sm:text-sm">
+          <thead className="border-b border-[var(--color-border)] text-left text-[11px] sm:text-xs uppercase text-[var(--color-muted-foreground)]">
+            <tr><th className="p-2.5 sm:p-3">Name</th><th className="p-2.5 sm:p-3">Phone</th><th className="p-2.5 sm:p-3">Orders</th><th className="p-2.5 sm:p-3">Lifetime Value</th><th className="p-2.5 sm:p-3">Last Order</th><th className="p-2.5 sm:p-3">Action</th></tr>
           </thead>
           <tbody>
             {customers.length === 0 ? (
               <tr><td colSpan={6} className="p-6 text-center text-[var(--color-muted-foreground)]">No customers match this search.</td></tr>
             ) : customers.map((c) => (
               <tr key={c.id} className="border-b border-[var(--color-border)] last:border-0 transition-colors hover:bg-[var(--color-muted)]">
-                <td className="p-3"><Link href={`/admin/customers/${c.id}`} className="font-medium text-[var(--color-primary)]">{c.name}</Link></td>
-                <td className="p-3">{c.phone}</td>
-                <td className="p-3">{c.totalOrders}</td>
-                <td className="p-3">{paiseToRupeeDisplay(c.lifetimeValuePaise)}</td>
-                <td className="p-3">{c.orders[0] ? format(c.orders[0].createdAt, "d MMM yyyy") : "—"}</td>
-                <td className="p-3"><Button asChild size="sm" variant="outline"><Link href={`/admin/customers/${c.id}`}>View</Link></Button></td>
+                <td className="p-2.5 sm:p-3"><Link href={`/admin/customers/${c.id}`} className="font-medium text-[var(--color-primary)] hover:underline">{c.name}</Link></td>
+                <td className="p-2.5 sm:p-3">{c.phone}</td>
+                <td className="p-2.5 sm:p-3">{c.totalOrders}</td>
+                <td className="p-2.5 sm:p-3 font-medium">{paiseToRupeeDisplay(c.lifetimeValuePaise)}</td>
+                <td className="p-2.5 sm:p-3 text-[11px] sm:text-xs text-[var(--color-muted-foreground)] whitespace-nowrap">{c.orders[0] ? format(c.orders[0].createdAt, "d MMM yyyy") : "—"}</td>
+                <td className="p-2.5 sm:p-3"><Button asChild size="sm" variant="outline" className="h-7 sm:h-8 text-xs"><Link href={`/admin/customers/${c.id}`}>View</Link></Button></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between text-sm text-[var(--color-muted-foreground)]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-[var(--color-muted-foreground)]">
         <span>Page {page} of {totalPages} · {total} customers</span>
-        <div className="flex gap-2">
-          {page > 1 && <Button asChild variant="outline" size="sm"><Link href={`/admin/customers?${new URLSearchParams({ ...(search ? { search } : {}), page: String(page - 1) }).toString()}`}>Previous</Link></Button>}
-          {page < totalPages && <Button asChild variant="outline" size="sm"><Link href={`/admin/customers?${new URLSearchParams({ ...(search ? { search } : {}), page: String(page + 1) }).toString()}`}>Next</Link></Button>}
+        <div className="flex gap-2 w-full sm:w-auto">
+          {page > 1 && <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none"><Link href={`/admin/customers?${new URLSearchParams({ ...(search ? { search } : {}), page: String(page - 1) }).toString()}`}>Previous</Link></Button>}
+          {page < totalPages && <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none"><Link href={`/admin/customers?${new URLSearchParams({ ...(search ? { search } : {}), page: String(page + 1) }).toString()}`}>Next</Link></Button>}
         </div>
       </div>
     </div>

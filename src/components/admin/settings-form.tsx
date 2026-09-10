@@ -85,14 +85,14 @@ export function SettingsForm({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] p-1 text-sm">
+    <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] p-1 text-xs sm:text-sm">
         {TABS.map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`rounded-full px-4 py-1.5 font-medium ${tab === t ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]" : "hover:bg-[var(--color-muted)]"}`}
+            className={`shrink-0 rounded-full px-3 sm:px-4 py-1.5 font-medium transition-colors ${tab === t ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-xs" : "hover:bg-[var(--color-muted)] text-[var(--color-muted-foreground)]"}`}
           >
             {t}
           </button>

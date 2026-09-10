@@ -44,23 +44,23 @@ export function UserManager({ users, currentUserId }: { users: AdminUserRow[]; c
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-sm md:grid-cols-5 md:items-end">
-        <div><Label htmlFor="user-name">Name</Label><Input id="user-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-        <div><Label htmlFor="user-email">Email</Label><Input id="user-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-        <div><Label htmlFor="user-role">Role</Label><select id="user-role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="h-10 w-full rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm">{ROLES.map((role) => <option key={role}>{role}</option>)}</select></div>
-        <div><Label htmlFor="user-password">Temporary password</Label><Input id="user-password" type="text" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
-        <Button disabled={saving === "invite"} onClick={invite}>{saving === "invite" ? "Adding..." : "Add staff"}</Button>
+      <div className="grid gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5 sm:p-4 shadow-sm sm:grid-cols-2 md:grid-cols-5 md:items-end">
+        <div><Label htmlFor="user-name" className="text-xs sm:text-sm">Name</Label><Input id="user-name" placeholder="Full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-9 sm:h-10 text-xs sm:text-sm" /></div>
+        <div><Label htmlFor="user-email" className="text-xs sm:text-sm">Email</Label><Input id="user-email" type="email" placeholder="staff@bakery.local" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="h-9 sm:h-10 text-xs sm:text-sm" /></div>
+        <div><Label htmlFor="user-role" className="text-xs sm:text-sm">Role</Label><select id="user-role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="h-9 sm:h-10 w-full rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 sm:px-3 text-xs sm:text-sm text-[var(--color-foreground)]">{ROLES.map((role) => <option key={role}>{role}</option>)}</select></div>
+        <div><Label htmlFor="user-password" className="text-xs sm:text-sm">Temporary password</Label><Input id="user-password" type="text" placeholder="Min 8 chars" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="h-9 sm:h-10 text-xs sm:text-sm" /></div>
+        <Button disabled={saving === "invite"} onClick={invite} className="h-9 sm:h-10 text-xs sm:text-sm sm:col-span-2 md:col-span-1">{saving === "invite" ? "Adding..." : "Add staff"}</Button>
       </div>
       <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="border-b border-[var(--color-border)] text-left text-xs uppercase text-[var(--color-muted-foreground)]"><tr><th className="p-3">Name</th><th className="p-3">Email</th><th className="p-3">Role</th><th className="p-3">Action</th></tr></thead>
+        <table className="w-full min-w-[480px] text-xs sm:text-sm">
+          <thead className="border-b border-[var(--color-border)] text-left text-[11px] sm:text-xs uppercase text-[var(--color-muted-foreground)]"><tr><th className="p-2.5 sm:p-3">Name</th><th className="p-2.5 sm:p-3">Email</th><th className="p-2.5 sm:p-3">Role</th><th className="p-2.5 sm:p-3">Action</th></tr></thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.id} className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-muted)]">
-                <td className="p-3">{user.name}{user.id === currentUserId ? " (you)" : ""}</td>
-                <td className="p-3">{user.email}</td>
-                <td className="p-3"><select value={user.role} disabled={saving === user.id} onChange={(e) => updateRole(user.id, e.target.value)} className="h-9 rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm">{ROLES.map((role) => <option key={role}>{role}</option>)}</select></td>
-                <td className="p-3">{user.id !== currentUserId && <button type="button" onClick={() => remove(user.id)} className="text-[var(--color-danger)] underline">Remove</button>}</td>
+              <tr key={user.id} className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-muted)] transition-colors">
+                <td className="p-2.5 sm:p-3 font-medium">{user.name}{user.id === currentUserId ? " (you)" : ""}</td>
+                <td className="p-2.5 sm:p-3">{user.email}</td>
+                <td className="p-2.5 sm:p-3"><select value={user.role} disabled={saving === user.id} onChange={(e) => updateRole(user.id, e.target.value)} className="h-8 sm:h-9 rounded-[var(--radius-base)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-xs sm:text-sm text-[var(--color-foreground)]">{ROLES.map((role) => <option key={role}>{role}</option>)}</select></td>
+                <td className="p-2.5 sm:p-3">{user.id !== currentUserId && <button type="button" onClick={() => remove(user.id)} className="text-[var(--color-danger)] underline text-xs">Remove</button>}</td>
               </tr>
             ))}
           </tbody>
