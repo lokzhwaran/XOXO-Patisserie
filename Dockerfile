@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 FROM node:22-alpine
 
-# Prisma's query engine needs openssl on Alpine; libc6-compat covers other native deps.
-RUN apk add --no-cache openssl libc6-compat
+# Prisma's query engine needs openssl on Alpine; libc6-compat, postgresql and su-exec for self-contained runtime.
+RUN apk add --no-cache openssl libc6-compat postgresql postgresql-contrib su-exec bash
 
 WORKDIR /app
 
@@ -19,8 +19,17 @@ COPY . .
 RUN pnpm prisma generate
 RUN pnpm build
 
+# Configure directories and permissions for internal PostgreSQL and entrypoint
+RUN mkdir -p /var/lib/postgresql/data /run/postgresql && \
+    chown -R postgres:postgres /var/lib/postgresql /run/postgresql && \
+    chmod 0700 /var/lib/postgresql/data && \
+    chmod 0775 /run/postgresql && \
+    chmod +x /app/scripts/docker-entrypoint.sh
+
 ENV NODE_ENV=production
+ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
+

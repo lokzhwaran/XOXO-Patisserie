@@ -275,151 +275,155 @@ async function main() {
     });
   }
 
-  // Customers
-  const customerNames = [
-    "Priya Ramesh","Karthik Subramaniam","Meera Natarajan","Arun Kumar","Divya Iyer",
-    "Vignesh Raja","Lakshmi Venkatesh","Suresh Babu","Anitha Krishnan","Rahul Menon",
-    "Sneha Pillai","Vivek Chandran",
-  ];
-  const customers = [];
-  for (let i = 0; i < customerNames.length; i++) {
-    const phone = `+9198765${(43210 + i).toString().padStart(5, "0")}`;
-    const customer = await prisma.customer.upsert({
-      where: { phone },
-      update: {},
-      create: {
-        phone,
-        name: customerNames[i],
-        email: `${customerNames[i].toLowerCase().replace(/\s/g, ".")}@example.com`,
-      },
-    });
-    const address = await prisma.address.create({
-      data: {
-        customerId: customer.id,
-        line1: `${10 + i}, ${["Gandhi Nagar", "Anna Salai", "T Nagar Main Road", "Besant Nagar"][i % 4]}`,
-        area: ["T Nagar", "Adyar", "Mylapore", "Velachery"][i % 4],
-        city: "Chennai",
-        state: "Tamil Nadu",
-        pincode: ["600017", "600020", "600004", "600042"][i % 4],
-        isDefault: true,
-      },
-    });
-    customers.push({ customer, address });
-  }
-
-  // Orders across the last 60 days
-  const products = await prisma.product.findMany();
-  const statuses: OrderStatus[] = [
-    OrderStatus.DELIVERED, OrderStatus.DELIVERED, OrderStatus.DELIVERED, OrderStatus.DELIVERED,
-    OrderStatus.OUT_FOR_DELIVERY, OrderStatus.PACKED, OrderStatus.BAKED, OrderStatus.CONFIRMED,
-    OrderStatus.CANCELLED, OrderStatus.REFUNDED, OrderStatus.PAYMENT_FAILED, OrderStatus.PENDING_PAYMENT,
-  ];
-
-  for (let i = 0; i < ORDER_COUNT; i++) {
-    const { customer, address } = customers[i % customers.length];
-    const orderDate = subDays(new Date(), Math.floor(Math.random() * 90));
-    const status = statuses[i % statuses.length];
-    const numItems = 1 + Math.floor(Math.random() * 3);
-    const pickedProducts = [...products].sort(() => 0.5 - Math.random()).slice(0, numItems);
-
-    let subtotal = 0;
-    const itemsData = pickedProducts.map((p) => {
-      const qty = 1 + Math.floor(Math.random() * 3);
-      const lineTotal = p.sellingPricePaise * qty;
-      subtotal += lineTotal;
-      return {
-        productId: p.id,
-        nameSnapshot: p.name,
-        codeSnapshot: p.code,
-        unitPricePaise: p.sellingPricePaise,
-        unitCostPaise: p.costOfMakingPaise,
-        quantity: qty,
-        lineTotalPaise: lineTotal,
-      };
-    });
-
-    const gst = Math.round(subtotal * 0.05);
-    const packaging = 3000;
-    const total = subtotal + gst + packaging;
-    const paymentStatus: PaymentStatus =
-      status === "PAYMENT_FAILED" ? PaymentStatus.FAILED
-      : status === "PENDING_PAYMENT" ? PaymentStatus.PENDING
-      : status === "REFUNDED" ? PaymentStatus.REFUNDED
-      : PaymentStatus.PAID;
-
-    const order = await prisma.order.create({
-      data: {
-        orderNumber: `BK-${format(orderDate, "yyMMdd")}-${SEED_RUN_ID}-${(1000 + i).toString()}`,
-        customerId: customer.id,
-        addressId: address.id,
-        status,
-        fulfilmentType: i % 5 === 0 ? FulfilmentType.PICKUP : FulfilmentType.DELIVERY,
-        requestedDate: addDays(orderDate, 1),
-        requestedTimeSlot: "13:00-16:00",
-        subtotalPaise: subtotal,
-        gstPaise: gst,
-        packagingPaise: packaging,
-        totalPaise: total,
-        paymentStatus,
-        createdAt: orderDate,
-        items: { create: itemsData },
-        statusEvents: {
-          create: { toStatus: status, actor: "SYSTEM", note: "Seeded order" },
+  // Seed initial demo customers, orders, and expenses only if none exist yet
+  const existingOrdersCount = await prisma.order.count();
+  if (existingOrdersCount === 0) {
+    // Customers
+    const customerNames = [
+      "Priya Ramesh","Karthik Subramaniam","Meera Natarajan","Arun Kumar","Divya Iyer",
+      "Vignesh Raja","Lakshmi Venkatesh","Suresh Babu","Anitha Krishnan","Rahul Menon",
+      "Sneha Pillai","Vivek Chandran",
+    ];
+    const customers = [];
+    for (let i = 0; i < customerNames.length; i++) {
+      const phone = `+9198765${(43210 + i).toString().padStart(5, "0")}`;
+      const customer = await prisma.customer.upsert({
+        where: { phone },
+        update: {},
+        create: {
+          phone,
+          name: customerNames[i],
+          email: `${customerNames[i].toLowerCase().replace(/\s/g, ".")}@example.com`,
         },
-      },
-    });
-
-    if (paymentStatus === PaymentStatus.PAID || paymentStatus === PaymentStatus.REFUNDED) {
-      await prisma.payment.create({
+      });
+      const address = await prisma.address.create({
         data: {
-          orderId: order.id,
-          purpose: "ORDER",
-          amountPaise: total,
-          status: paymentStatus,
-          razorpayOrderId: `order_seed_${i}`,
-          razorpayPaymentId: `pay_seed_${i}`,
-          method: "upi",
+          customerId: customer.id,
+          line1: `${10 + i}, ${["Gandhi Nagar", "Anna Salai", "T Nagar Main Road", "Besant Nagar"][i % 4]}`,
+          area: ["T Nagar", "Adyar", "Mylapore", "Velachery"][i % 4],
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pincode: ["600017", "600020", "600004", "600042"][i % 4],
+          isDefault: true,
         },
+      });
+      customers.push({ customer, address });
+    }
+
+    // Orders across the last 60 days
+    const products = await prisma.product.findMany();
+    const statuses: OrderStatus[] = [
+      OrderStatus.DELIVERED, OrderStatus.DELIVERED, OrderStatus.DELIVERED, OrderStatus.DELIVERED,
+      OrderStatus.OUT_FOR_DELIVERY, OrderStatus.PACKED, OrderStatus.BAKED, OrderStatus.CONFIRMED,
+      OrderStatus.CANCELLED, OrderStatus.REFUNDED, OrderStatus.PAYMENT_FAILED, OrderStatus.PENDING_PAYMENT,
+    ];
+
+    for (let i = 0; i < ORDER_COUNT; i++) {
+      const { customer, address } = customers[i % customers.length];
+      const orderDate = subDays(new Date(), Math.floor(Math.random() * 90));
+      const status = statuses[i % statuses.length];
+      const numItems = 1 + Math.floor(Math.random() * 3);
+      const pickedProducts = [...products].sort(() => 0.5 - Math.random()).slice(0, numItems);
+
+      let subtotal = 0;
+      const itemsData = pickedProducts.map((p) => {
+        const qty = 1 + Math.floor(Math.random() * 3);
+        const lineTotal = p.sellingPricePaise * qty;
+        subtotal += lineTotal;
+        return {
+          productId: p.id,
+          nameSnapshot: p.name,
+          codeSnapshot: p.code,
+          unitPricePaise: p.sellingPricePaise,
+          unitCostPaise: p.costOfMakingPaise,
+          quantity: qty,
+          lineTotalPaise: lineTotal,
+        };
+      });
+
+      const gst = Math.round(subtotal * 0.05);
+      const packaging = 3000;
+      const total = subtotal + gst + packaging;
+      const paymentStatus: PaymentStatus =
+        status === "PAYMENT_FAILED" ? PaymentStatus.FAILED
+        : status === "PENDING_PAYMENT" ? PaymentStatus.PENDING
+        : status === "REFUNDED" ? PaymentStatus.REFUNDED
+        : PaymentStatus.PAID;
+
+      const order = await prisma.order.create({
+        data: {
+          orderNumber: `BK-${format(orderDate, "yyMMdd")}-${SEED_RUN_ID}-${(1000 + i).toString()}`,
+          customerId: customer.id,
+          addressId: address.id,
+          status,
+          fulfilmentType: i % 5 === 0 ? FulfilmentType.PICKUP : FulfilmentType.DELIVERY,
+          requestedDate: addDays(orderDate, 1),
+          requestedTimeSlot: "13:00-16:00",
+          subtotalPaise: subtotal,
+          gstPaise: gst,
+          packagingPaise: packaging,
+          totalPaise: total,
+          paymentStatus,
+          createdAt: orderDate,
+          items: { create: itemsData },
+          statusEvents: {
+            create: { toStatus: status, actor: "SYSTEM", note: "Seeded order" },
+          },
+        },
+      });
+
+      if (paymentStatus === PaymentStatus.PAID || paymentStatus === PaymentStatus.REFUNDED) {
+        await prisma.payment.create({
+          data: {
+            orderId: order.id,
+            purpose: "ORDER",
+            amountPaise: total,
+            status: paymentStatus,
+            razorpayOrderId: `order_seed_${i}`,
+            razorpayPaymentId: `pay_seed_${i}`,
+            method: "upi",
+          },
+        });
+      }
+
+      if (status === "OUT_FOR_DELIVERY" || status === "DELIVERED") {
+        await prisma.delivery.create({
+          data: {
+            orderId: order.id,
+            provider: "MANUAL",
+            riderName: "Ganesh (Porter)",
+            riderPhone: "+919876500000",
+            status: status === "DELIVERED" ? "DELIVERED" : "OUT_FOR_DELIVERY",
+            actualFarePaise: 4500,
+            quotedFarePaise: 4500,
+          },
+        });
+      }
+
+      await prisma.customer.update({
+        where: { id: customer.id },
+        data: { totalOrders: { increment: 1 }, lifetimeValuePaise: { increment: total } },
       });
     }
 
-    if (status === "OUT_FOR_DELIVERY" || status === "DELIVERED") {
-      await prisma.delivery.create({
+    // Expenses
+    const expenseCategories: ExpenseCategory[] = [
+      ExpenseCategory.INGREDIENTS, ExpenseCategory.PACKAGING, ExpenseCategory.UTILITIES,
+      ExpenseCategory.MARKETING, ExpenseCategory.DELIVERY, ExpenseCategory.OTHER,
+    ];
+    for (let i = 0; i < EXPENSE_COUNT; i++) {
+      await prisma.expense.create({
         data: {
-          orderId: order.id,
-          provider: "MANUAL",
-          riderName: "Ganesh (Porter)",
-          riderPhone: "+919876500000",
-          status: status === "DELIVERED" ? "DELIVERED" : "OUT_FOR_DELIVERY",
-          actualFarePaise: 4500,
-          quotedFarePaise: 4500,
+          date: subDays(new Date(), Math.floor(Math.random() * 60)),
+          category: expenseCategories[i % expenseCategories.length],
+          description: [
+            "Chocolate & butter restock", "Packaging boxes (100 units)", "Electricity bill",
+            "Instagram ads", "Porter delivery charges", "Gas cylinder refill",
+          ][i % 6],
+          amountPaise: 50000 + Math.floor(Math.random() * 500000),
         },
       });
     }
-
-    await prisma.customer.update({
-      where: { id: customer.id },
-      data: { totalOrders: { increment: 1 }, lifetimeValuePaise: { increment: total } },
-    });
-  }
-
-  // Expenses
-  const expenseCategories: ExpenseCategory[] = [
-    ExpenseCategory.INGREDIENTS, ExpenseCategory.PACKAGING, ExpenseCategory.UTILITIES,
-    ExpenseCategory.MARKETING, ExpenseCategory.DELIVERY, ExpenseCategory.OTHER,
-  ];
-  for (let i = 0; i < EXPENSE_COUNT; i++) {
-    await prisma.expense.create({
-      data: {
-        date: subDays(new Date(), Math.floor(Math.random() * 60)),
-        category: expenseCategories[i % expenseCategories.length],
-        description: [
-          "Chocolate & butter restock", "Packaging boxes (100 units)", "Electricity bill",
-          "Instagram ads", "Porter delivery charges", "Gas cylinder refill",
-        ][i % 6],
-        amountPaise: 50000 + Math.floor(Math.random() * 500000),
-      },
-    });
   }
 
   const seededAccounts = [
