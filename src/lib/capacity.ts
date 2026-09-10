@@ -81,15 +81,15 @@ export async function reserveCapacity(
   await prisma.$transaction(
     async (tx) => {
       for (const item of items) {
-        await ensureDailyCapacity(tx, item.productId, date);
-        // Row lock via raw SQL FOR UPDATE to serialize concurrent reservations on this row.
+        const row = await ensureDailyCapacity(tx, item.productId, date);
+        // Row lock via raw SQL FOR UPDATE by primary key id to serialize concurrent reservations.
         const rows = await tx.$queryRaw<
           { id: string; maxQuantity: number; reservedQuantity: number; soldQuantity: number; isBlocked: boolean }[]
         >`SELECT id, "maxQuantity", "reservedQuantity", "soldQuantity", "isBlocked"
             FROM "DailyCapacity"
-            WHERE "productId" = ${item.productId} AND "date" = ${date}
+            WHERE id = ${row.id}
             FOR UPDATE`;
-        const cap = rows[0];
+        const cap = rows[0] ?? row;
         if (!cap || cap.isBlocked) {
           throw new CapacityExceededError(item.productName, 0, item.quantity);
         }
@@ -114,8 +114,9 @@ export async function convertReservedToSold(
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
+      const row = await ensureDailyCapacity(tx, item.productId, date);
       await tx.dailyCapacity.update({
-        where: { productId_date: { productId: item.productId, date } },
+        where: { id: row.id },
         data: {
           reservedQuantity: { decrement: item.quantity },
           soldQuantity: { increment: item.quantity },
@@ -132,8 +133,9 @@ export async function releaseReservedCapacity(
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
+      const row = await ensureDailyCapacity(tx, item.productId, date);
       await tx.dailyCapacity.update({
-        where: { productId_date: { productId: item.productId, date } },
+        where: { id: row.id },
         data: { reservedQuantity: { decrement: item.quantity } },
       });
     }
@@ -148,8 +150,9 @@ export async function releaseSoldCapacity(
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
+      const row = await ensureDailyCapacity(tx, item.productId, date);
       await tx.dailyCapacity.update({
-        where: { productId_date: { productId: item.productId, date } },
+        where: { id: row.id },
         data: { soldQuantity: { decrement: item.quantity } },
       });
     }
