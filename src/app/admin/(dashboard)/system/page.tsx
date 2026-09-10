@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getAppMode } from "@/lib/app-mode";
 import { Badge } from "@/components/ui/badge";
+import { AlertsList } from "@/components/admin/alerts-list";
 
 async function lastEvent(domain: string) {
   return prisma.sandboxEvent.findFirst({ where: { domain }, orderBy: { createdAt: "desc" } });
@@ -8,9 +9,12 @@ async function lastEvent(domain: string) {
 
 export default async function AdminSystemPage() {
   const mode = getAppMode();
-  const lastPayment = await lastEvent("PAYMENT");
-  const lastDelivery = await lastEvent("DELIVERY");
-  const lastNotification = await prisma.notificationOutbox.findFirst({ orderBy: { createdAt: "desc" } });
+  const [lastPayment, lastDelivery, lastNotification, alerts] = await Promise.all([
+    lastEvent("PAYMENT"),
+    lastEvent("DELIVERY"),
+    prisma.notificationOutbox.findFirst({ orderBy: { createdAt: "desc" } }),
+    prisma.adminAlert.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
+  ]);
 
   const integrations = [
     {
@@ -41,14 +45,15 @@ export default async function AdminSystemPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-heading text-xl sm:text-2xl">System</h1>
+        <h1 className="font-heading text-xl sm:text-2xl">System & Integrations</h1>
         <p className="mt-1 text-xs sm:text-sm text-[var(--color-muted-foreground)] flex items-center gap-2">
           <span>Current mode:</span>
           <Badge tone={mode === "sandbox" ? "warning" : "success"} className="text-xs">{mode.toUpperCase()}</Badge>
         </p>
       </div>
+
       <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm">
         <table className="w-full min-w-[480px] text-xs sm:text-sm">
           <thead className="border-b border-[var(--color-border)] text-left text-[11px] sm:text-xs uppercase text-[var(--color-muted-foreground)]">
@@ -69,6 +74,20 @@ export default async function AdminSystemPage() {
           </tbody>
         </table>
       </div>
+
+      <AlertsList
+        initialAlerts={alerts.map((a) => ({
+          id: a.id,
+          type: a.type,
+          severity: a.severity,
+          title: a.title,
+          body: a.body,
+          isRead: a.isRead,
+          relatedOrderId: a.relatedOrderId,
+          relatedProductId: a.relatedProductId,
+          createdAt: a.createdAt.toISOString(),
+        }))}
+      />
     </div>
   );
 }
