@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Patisserie gift box</title>
+  <desc id="desc">A blush gift box filled with brownies and cookies.</desc>
+  <rect width="800" height="800" fill="#f8eee7" />
+  <circle cx="640" cy="150" r="145" fill="#d9e0d1" opacity=".78" />
+  <circle cx="140" cy="620" r="125" fill="#edc7bf" opacity=".7" />
+  <ellipse cx="400" cy="670" rx="280" ry="48" fill="#4a252b" opacity=".18" />
+  <path d="M160 360l240-110 240 110-240 115z" fill="#e6a56e" />
+  <path d="M160 360v242l240 130V475z" fill="#c7765c" />
+  <path d="M640 360v242L400 732V475z" fill="#a95d4e" />
+  <path d="M400 250v225M400 475v257" stroke="#f3c58e" stroke-width="34" />
+  <path d="M160 360l240 115 240-115" fill="none" stroke="#f3c58e" stroke-width="24" />
+  <rect x="285" y="319" width="230" height="35" rx="17" fill="#f7d19e" transform="rotate(-25 400 335)" />
+  <rect x="285" y="319" width="230" height="35" rx="17" fill="#f7d19e" transform="rotate(25 400 335)" />
+  <circle cx="400" cy="332" r="44" fill="#d9877f" />
+  <path d="M400 332c-55-45-82 19-38 42 19 10 31-9 38-24 7 15 19 34 38 24 44-23 17-87-38-42z" fill="#f3bd7f" />
+  <circle cx="302" cy="485" r="34" fill="#f0b674" />
+  <circle cx="493" cy="555" r="42" fill="#6f3934" />
+</svg>

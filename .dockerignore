@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.sandbox
+.tmp
+.env
+.env.*
+!.env.example
+tests
+playwright-report
+test-results
+*.log
+pnpm-lock.yaml.bak
+tsconfig.tsbuildinfo

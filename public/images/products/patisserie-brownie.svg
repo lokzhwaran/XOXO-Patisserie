@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Fresh chocolate brownie</title>
+  <desc id="desc">A rich chocolate brownie on a blush patisserie plate.</desc>
+  <rect width="800" height="800" fill="#f8eee7" />
+  <circle cx="650" cy="145" r="150" fill="#edc7bf" opacity=".75" />
+  <circle cx="120" cy="650" r="110" fill="#f1d7bb" opacity=".7" />
+  <ellipse cx="400" cy="610" rx="270" ry="55" fill="#4a252b" opacity=".18" />
+  <ellipse cx="400" cy="565" rx="245" ry="45" fill="#e2a777" />
+  <path d="M205 525h390l-34 64H239z" fill="#c87c60" />
+  <rect x="220" y="265" width="360" height="270" rx="34" fill="#3a2025" transform="rotate(-5 400 400)" />
+  <rect x="247" y="292" width="306" height="218" rx="23" fill="#6f3934" transform="rotate(-5 400 400)" />
+  <path d="M280 370c55-45 104 30 159-5s92 31 145-5" fill="none" stroke="#d79761" stroke-width="22" stroke-linecap="round" />
+  <path d="M290 442c52-31 88 25 141-4s91 29 135-3" fill="none" stroke="#b96d51" stroke-width="16" stroke-linecap="round" />
+  <circle cx="326" cy="364" r="13" fill="#efb56f" />
+  <circle cx="477" cy="446" r="11" fill="#efb56f" />
+  <circle cx="505" cy="338" r="8" fill="#efb56f" />
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">A patisserie table with brownies and cookies</title>
+  <desc id="desc">A warm editorial illustration of fresh patisserie treats arranged on a table.</desc>
+  <rect width="1600" height="1000" fill="#f7efe4" />
+  <circle cx="1300" cy="170" r="250" fill="#e8c1b3" opacity=".72" />
+  <circle cx="1450" cy="330" r="150" fill="#d9877f" opacity=".55" />
+  <path d="M0 710h1600v290H0z" fill="#5a2b2d" />
+  <path d="M0 710h1600v34H0z" fill="#7c3d3c" />
+  <ellipse cx="1190" cy="720" rx="310" ry="48" fill="#3d2024" opacity=".35" />
+  <g transform="translate(960 390)">
+    <ellipse cx="230" cy="335" rx="250" ry="42" fill="#d7a174" />
+    <rect x="35" y="275" width="390" height="52" rx="18" fill="#f2c28f" />
+    <path d="M108 320h245l-26 72H134z" fill="#d69a70" />
+    <ellipse cx="230" cy="395" rx="128" ry="20" fill="#b46e5d" opacity=".65" />
+    <rect x="52" y="58" width="355" height="235" rx="28" fill="#351d22" transform="rotate(-6 230 175)" />
+    <rect x="76" y="80" width="307" height="185" rx="18" fill="#713c36" transform="rotate(-6 230 175)" />
+    <path d="M104 143c52-39 93 29 147-4s83 28 132-6" fill="none" stroke="#d79563" stroke-width="18" stroke-linecap="round" opacity=".85" />
+    <path d="M116 208c45-26 77 23 125-3s83 25 128-4" fill="none" stroke="#c77d57" stroke-width="14" stroke-linecap="round" opacity=".8" />
+    <circle cx="151" cy="142" r="10" fill="#efb26e" />
+    <circle cx="319" cy="215" r="9" fill="#efb26e" />
+  </g>
+  <g transform="translate(1210 560)">
+    <circle cx="0" cy="0" r="78" fill="#d9877f" />
+    <circle cx="0" cy="0" r="58" fill="#f3bd7f" />
+    <circle cx="-18" cy="-14" r="8" fill="#9f5a4f" />
+    <circle cx="25" cy="20" r="7" fill="#9f5a4f" />
+    <circle cx="12" cy="-28" r="6" fill="#9f5a4f" />
+  </g>
+  <g transform="translate(1420 625)">
+    <circle cx="0" cy="0" r="58" fill="#d9877f" />
+    <circle cx="0" cy="0" r="42" fill="#edb477" />
+    <circle cx="-12" cy="-10" r="6" fill="#9f5a4f" />
+    <circle cx="17" cy="12" r="6" fill="#9f5a4f" />
+  </g>
+  <path d="M138 220h300" stroke="#7c3d3c" stroke-width="5" opacity=".45" />
+  <path d="M138 248h180" stroke="#d9877f" stroke-width="5" opacity=".7" />
+  <circle cx="190" cy="300" r="8" fill="#d9877f" />
+  <circle cx="234" cy="300" r="8" fill="#d9877f" />
+  <circle cx="278" cy="300" r="8" fill="#d9877f" />
+</svg>

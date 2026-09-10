@@ -1,0 +1,438 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Site-wide settings (singleton), theming, branding, ordering rules
+// ---------------------------------------------------------------------------
+model SiteSettings {
+  id                     String   @id @default(cuid())
+  isSingleton            Boolean  @default(true) @unique
+  // Theme (design tokens)
+  theme                  Json
+  // Branding
+  logoUrl                String?
+  faviconUrl             String?
+  businessName           String   @default("XOXO Patisserie")
+  tagline                String   @default("Homemade brownies & cookies, baked fresh in Chennai")
+  contactEmail           String   @default("hello@xoxobakery.in")
+  whatsappNumber         String   @default("+919999999999")
+  businessAddress        String   @default("Chennai, Tamil Nadu, India")
+  fssaiNumber            String   @default("11421999000000")
+  gstNumber              String   @default("33AAAAA0000A1Z5")
+  instagramUrl           String?
+  facebookUrl            String?
+  // Content
+  heroHeading            String   @default("A little sweetness, made to linger.")
+  heroSubheading         String   @default("Small-batch brownies, cookies and gifting treats, baked fresh by XOXO Patisserie in Chennai.")
+  heroCtaLabel           String   @default("Place an Order")
+  heroImageUrl           String?
+  aboutHeading           String   @default("Our story")
+  aboutCopy              String   @default("XOXO Patisserie started in a small home kitchen in Chennai with one mission: bake the kind of brownies and cookies we ourselves wanted to eat every day.")
+  aboutImageUrl          String?
+  whyUsCopy              Json?
+  testimonials           Json?
+  faq                    Json?
+  footerCopy             String   @default("Baked fresh, delivered with love.")
+  // Ordering rules
+  ordersEnabled          Boolean  @default(true)
+  orderingPausedMessage  String   @default("We're taking a short break! Please check back soon.")
+  nextAvailableDate      DateTime?
+  nextAvailableMessage   String?
+  blockedDateRanges      Json?
+  leadTimeHours          Int      @default(24)
+  timeSlots              Json     @default("[\"10:00-13:00\",\"13:00-16:00\",\"16:00-19:00\",\"19:00-21:00\"]")
+  serviceablePincodes    Json?
+  gstRatePercent         Int      @default(5)
+  packagingChargePaise   Int      @default(3000)
+  minOrderValuePaise     Int      @default(30000)
+  deliveryNote           String   @default("Delivery charges are calculated after your order is packed and are collected separately.")
+  // Delivery
+  deliveryBaseChargePaise    Int      @default(4000)
+  deliveryPerKmChargePaise   Int      @default(1000)
+  freeDeliveryThresholdPaise Int?
+  pickupAddress              String   @default("XOXO Patisserie, Chennai, Tamil Nadu")
+  tryAutoDeliveryBooking     Boolean  @default(false)
+  // Payments
+  razorpayTestMode       Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id                String            @id @default(cuid())
+  categoryId        String
+  category          Category          @relation(fields: [categoryId], references: [id])
+  name              String
+  slug              String            @unique
+  code              String            @unique
+  description       String
+  ingredients       String
+  allergens         String[]          @default([])
+  images            String[]          @default([])
+  isVeg             Boolean           @default(true)
+  sellingPricePaise Int
+  costOfMakingPaise Int
+  weightGrams       Int
+  isActive          Boolean           @default(true)
+  isFeatured        Boolean           @default(false)
+  sortOrder         Int               @default(0)
+  variants          ProductVariant[]
+  dailyCapacities   DailyCapacity[]
+  capacityDefault   CapacityDefault?
+  orderItems        OrderItem[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([categoryId])
+}
+
+model ProductVariant {
+  id             String   @id @default(cuid())
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name           String
+  priceDeltaPaise Int     @default(0)
+  costDeltaPaise  Int     @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@index([productId])
+}
+
+// One row per product per date holding the daily bake capacity
+model DailyCapacity {
+  id                String   @id @default(cuid())
+  productId         String
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  date              DateTime @db.Date
+  maxQuantity       Int
+  reservedQuantity  Int      @default(0)
+  soldQuantity      Int      @default(0)
+  isBlocked         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([productId, date])
+  @@index([date])
+}
+
+// Default weekday/weekend capacity used to auto-generate DailyCapacity rows
+model CapacityDefault {
+  id         String  @id @default(cuid())
+  productId  String  @unique
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  weekdayMax Int
+  weekendMax Int
+}
+
+// ---------------------------------------------------------------------------
+// Customers
+// ---------------------------------------------------------------------------
+model Customer {
+  id                 String    @id @default(cuid())
+  phone              String    @unique
+  name               String
+  email              String?
+  altPhone           String?
+  createdAt          DateTime  @default(now())
+  totalOrders        Int       @default(0)
+  lifetimeValuePaise Int       @default(0)
+  addresses          Address[]
+  orders             Order[]
+}
+
+model Address {
+  id                    String    @id @default(cuid())
+  customerId            String
+  customer              Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  line1                 String
+  line2                 String?
+  landmark              String?
+  area                  String?
+  city                  String    @default("Chennai")
+  state                 String    @default("Tamil Nadu")
+  pincode               String
+  deliveryInstructions  String?
+  latitude              Float?
+  longitude             Float?
+  isDefault             Boolean   @default(false)
+  orders                Order[]
+  createdAt             DateTime  @default(now())
+
+  @@index([customerId])
+}
+
+// ---------------------------------------------------------------------------
+// Orders
+// ---------------------------------------------------------------------------
+enum OrderStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  IN_PROGRESS
+  BAKED
+  PACKED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  READY_FOR_PICKUP
+  CANCELLED
+  REFUNDED
+  PAYMENT_FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  FAILED
+  REFUNDED
+}
+
+enum FulfilmentType {
+  DELIVERY
+  PICKUP
+}
+
+enum DeliveryChargeStatus {
+  NOT_APPLICABLE
+  PENDING
+  PAID
+}
+
+model Order {
+  id                   String                @id @default(cuid())
+  orderNumber          String                @unique
+  customerId           String
+  customer             Customer              @relation(fields: [customerId], references: [id])
+  addressId            String?
+  address              Address?              @relation(fields: [addressId], references: [id])
+  status               OrderStatus           @default(PENDING_PAYMENT)
+  fulfilmentType       FulfilmentType
+  requestedDate        DateTime              @db.Date
+  requestedTimeSlot    String
+  occasionMessage      String?
+  subtotalPaise        Int
+  gstPaise             Int
+  packagingPaise       Int
+  discountPaise        Int                   @default(0)
+  totalPaise           Int
+  deliveryChargePaise  Int?
+  deliveryChargeStatus DeliveryChargeStatus  @default(NOT_APPLICABLE)
+  paymentStatus        PaymentStatus         @default(PENDING)
+  notes                String?
+  adminNotes           String?
+  reservationExpiresAt DateTime?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  cancelledAt          DateTime?
+  cancellationReason   String?
+
+  items                OrderItem[]
+  payments             Payment[]
+  delivery             Delivery?
+  statusEvents         OrderStatusEvent[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([requestedDate])
+}
+
+model OrderItem {
+  id             String          @id @default(cuid())
+  orderId        String
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product         @relation(fields: [productId], references: [id])
+  variantId      String?
+  nameSnapshot   String
+  codeSnapshot   String
+  unitPricePaise Int
+  unitCostPaise  Int
+  quantity       Int
+  lineTotalPaise Int
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id                 String   @id @default(cuid())
+  orderId            String
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  purpose            String   @default("ORDER") // ORDER | DELIVERY_CHARGE
+  provider           String   @default("razorpay")
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  method             String?
+  amountPaise        Int
+  status             PaymentStatus @default(PENDING)
+  isSandbox          Boolean  @default(false)
+  rawPayload         Json?
+  createdAt          DateTime @default(now())
+
+  @@index([orderId])
+  @@index([razorpayOrderId])
+}
+
+model Delivery {
+  id              String    @id @default(cuid())
+  orderId         String    @unique
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider        String    // PORTER | MANUAL | SELF
+  externalOrderId String?
+  riderName       String?
+  riderPhone      String?
+  trackingUrl     String?
+  quotedFarePaise Int?
+  actualFarePaise Int?
+  status          String    @default("PENDING")
+  pickupEta       DateTime?
+  dropEta         DateTime?
+  createdAt       DateTime  @default(now())
+  rawPayload      Json?
+}
+
+model OrderStatusEvent {
+  id         String      @id @default(cuid())
+  orderId    String
+  order      Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus OrderStatus?
+  toStatus   OrderStatus
+  note       String?
+  actor      String      // ADMIN | SYSTEM | CUSTOMER
+  createdAt  DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+// ---------------------------------------------------------------------------
+// Financials
+// ---------------------------------------------------------------------------
+enum ExpenseCategory {
+  INGREDIENTS
+  PACKAGING
+  UTILITIES
+  MARKETING
+  DELIVERY
+  OTHER
+}
+
+model Expense {
+  id            String          @id @default(cuid())
+  date          DateTime        @db.Date
+  category      ExpenseCategory
+  description   String
+  amountPaise   Int
+  notes         String?
+  receiptUrl    String?
+  createdAt     DateTime        @default(now())
+}
+
+model AdminAlert {
+  id                String   @id @default(cuid())
+  type              String
+  severity          String   @default("INFO") // INFO | WARNING | CRITICAL
+  title             String
+  body              String
+  isRead            Boolean  @default(false)
+  relatedOrderId    String?
+  relatedProductId  String?
+  createdAt         DateTime @default(now())
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  authUid      String?   @unique
+  email        String    @unique
+  name         String
+  role         String    @default("STAFF") // OWNER | MANAGER | STAFF
+  passwordHash String? // sandbox credentials auth; null when only Supabase Auth (live mode) is used
+  createdAt    DateTime  @default(now())
+  sessions     AdminSession[]
+}
+
+// Sandbox-mode auth sessions (signed, HTTP-only cookie references one of these rows)
+model AdminSession {
+  id        String   @id @default(cuid())
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Idempotency store for Razorpay webhook events
+model WebhookEvent {
+  id         String   @id
+  provider   String
+  eventType  String
+  processedAt DateTime @default(now())
+}
+
+// Capacity notify-me requests when a product is sold out for a date
+model NotifyRequest {
+  id        String   @id @default(cuid())
+  productId String
+  date      DateTime @db.Date
+  phone     String
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId, date])
+}
+
+// Sandbox-mode notification transport — every WhatsApp/email/SMS "sent" in sandbox mode is
+// recorded here (fully rendered) so it's reviewable in the Sandbox Console without real providers.
+model NotificationOutbox {
+  id          String   @id @default(cuid())
+  channel     String // WHATSAPP | EMAIL | SMS
+  templateKey String
+  to          String
+  subject     String?
+  body        String
+  variables   Json
+  relatedOrderId String?
+  createdAt   DateTime @default(now())
+}
+
+// Sandbox-mode event log for the payment/delivery simulators (drives the Sandbox Console)
+model SandboxEvent {
+  id        String   @id @default(cuid())
+  domain    String // PAYMENT | DELIVERY
+  eventType String
+  refId     String // orderId or deliveryId
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@index([domain, refId])
+}
+
+// GST invoice numbering sequence — one row, atomically incremented per invoice.
+model InvoiceSequence {
+  id           String @id @default("singleton")
+  lastNumber   Int    @default(0)
+  financialYear String @default("2526")
+}
