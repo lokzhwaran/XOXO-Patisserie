@@ -70,8 +70,8 @@ export default async function HomePage() {
 
       <RevealSection className="mx-auto max-w-(--container-max) px-4 py-12 sm:py-20 sm:px-6 lg:px-8">
         <div className="grid items-center gap-8 sm:gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="relative overflow-hidden rounded-[calc(var(--radius-base)*2)] border border-[var(--color-border)] bg-[var(--color-surface)] p-2 sm:p-3 shadow-[0_20px_60px_rgba(43,29,20,0.06)]">
-            <div className="relative aspect-[5/4] overflow-hidden rounded-[calc(var(--radius-base)*1.5)] bg-[var(--color-muted)]">
+          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2 sm:p-3 shadow-[0_20px_60px_rgba(43,29,20,0.06)]">
+            <div className="relative aspect-[5/4] overflow-hidden rounded-xl sm:rounded-2xl bg-[var(--color-muted)]">
               {settings.aboutImageUrl ? (
                 <Image src={settings.aboutImageUrl} alt="Bakery kitchen" fill className="object-cover" />
               ) : (

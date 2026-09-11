@@ -19,7 +19,9 @@
   --color-danger: #B23B3B;
   --font-heading: "Fraunces", serif;
   --font-body: "Inter", sans-serif;
-  --radius-base: 9999px;
+  --radius-base: 12px;
+  --radius-sm: 6px;
+  --radius-lg: 18px;
   --container-max: 1280px;
 }
 
@@ -42,8 +44,8 @@
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
   --radius-base: var(--radius-base);
-  --radius-sm: calc(var(--radius-base) * 0.5);
-  --radius-lg: calc(var(--radius-base) * 1.5);
+  --radius-sm: var(--radius-sm);
+  --radius-lg: var(--radius-lg);
 }
 
 html {

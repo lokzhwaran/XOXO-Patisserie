@@ -127,10 +127,9 @@ export const CURATED_FONTS = [
 
 export function themeToCssVars(theme: ThemeTokens): string {
   const c = theme.colors;
-  const radiusSm = Math.round(theme.radiusBasePx * 0.5);
-  const radiusLg = Math.round(theme.radiusBasePx * 1.5);
-  const radius =
-    theme.buttonStyle === "pill" ? "9999px" : theme.buttonStyle === "square" ? "0px" : `${theme.radiusBasePx}px`;
+  const radiusBase = theme.radiusBasePx || 12;
+  const radiusSm = Math.round(radiusBase * 0.5);
+  const radiusLg = Math.round(radiusBase * 1.5);
   return `
     --color-background: ${c.background};
     --color-foreground: ${c.foreground};
@@ -149,7 +148,7 @@ export function themeToCssVars(theme: ThemeTokens): string {
     --color-danger: ${c.danger};
     --font-heading: "${theme.headingFont}", serif;
     --font-body: "${theme.bodyFont}", sans-serif;
-    --radius-base: ${radius};
+    --radius-base: ${theme.buttonStyle === "square" ? "0px" : `${radiusBase}px`};
     --radius-sm: ${theme.buttonStyle === "square" ? "0px" : `${radiusSm}px`};
     --radius-lg: ${theme.buttonStyle === "square" ? "0px" : `${radiusLg}px`};
     --container-max: ${theme.containerMaxWidthPx}px;
