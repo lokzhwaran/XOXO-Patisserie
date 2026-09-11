@@ -20,7 +20,7 @@ model SiteSettings {
   faviconUrl             String?
   businessName           String   @default("XOXO Patisserie")
   tagline                String   @default("Homemade brownies & cookies, baked fresh in Chennai")
-  contactEmail           String   @default("hello@xoxobakery.in")
+  contactEmail           String   @default("hello@xoxopatisserie.in")
   whatsappNumber         String   @default("+919999999999")
   businessAddress        String   @default("Chennai, Tamil Nadu, India")
   fssaiNumber            String   @default("11421999000000")
