@@ -29,13 +29,12 @@ export default async function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover object-right md:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-background)] via-[var(--color-background)]/90 to-[var(--color-background)]/15" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_30%,_rgba(217,138,143,0.16),_transparent_30%)]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-background)] via-[var(--color-background)]/85 to-transparent" />
         <div className="homepage-hero-content relative z-10 mx-auto w-full max-w-(--container-max) px-4 py-12 sm:px-6 sm:py-28 lg:px-8">
           <div className="max-w-2xl text-[var(--color-foreground)]">
-            <span className="eyebrow border-[var(--color-border)] bg-[var(--color-surface)]/70 text-[var(--color-foreground)]">
+            <span className="eyebrow border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)]">
               XOXO Patisserie · Chennai
             </span>
             <h1 className="mt-4 sm:mt-6 max-w-xl font-heading text-4xl sm:text-6xl lg:text-7xl leading-[1.05] sm:leading-[0.98]">{settings.heroHeading}</h1>
@@ -48,7 +47,7 @@ export default async function HomePage() {
                 nextAvailableMessage={settings.nextAvailableMessage}
                 whatsappNumber={settings.whatsappNumber}
               />
-              <Button asChild variant="outline" size="lg" className="bg-[var(--color-surface)]/65 w-full sm:w-auto">
+              <Button asChild variant="outline" size="lg" className="bg-[var(--color-surface)] w-full sm:w-auto">
                 <Link href="/menu">Browse Menu</Link>
               </Button>
             </div>
@@ -58,7 +57,7 @@ export default async function HomePage() {
                 { label: "Delivery", value: "Chennai" },
                 { label: "Freshness", value: "24h" },
               ].map((item) => (
-                <div key={item.label} className="rounded-xl sm:rounded-2xl border border-[var(--color-border)]/80 bg-[var(--color-surface)]/60 p-2.5 sm:p-4 backdrop-blur-sm">
+                <div key={item.label} className="rounded-xl sm:rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2.5 sm:p-4 shadow-xs">
                   <div className="text-[10px] sm:text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]">{item.label}</div>
                   <div className="mt-1 font-heading text-sm sm:text-xl text-[var(--color-foreground)] font-semibold">{item.value}</div>
                 </div>

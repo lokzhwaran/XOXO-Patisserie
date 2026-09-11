@@ -71,9 +71,7 @@ button, a, input, select, textarea {
 }
 
 body {
-  background:
-    radial-gradient(circle at top, color-mix(in srgb, var(--color-primary) 9%, transparent), transparent 30%),
-    var(--color-background);
+  background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-body);
 }
@@ -103,22 +101,21 @@ img {
   align-items: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-  background: rgba(255, 255, 255, 0.45);
-  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0.4rem 0.85rem;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-foreground);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 3px rgba(36, 24, 17, 0.05);
 }
 
 .section-shell {
-  border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-  background: rgba(255, 255, 255, 0.38);
-  box-shadow: 0 20px 45px rgba(43, 29, 20, 0.04);
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 4px 20px rgba(43, 29, 20, 0.04);
 }
 
 @media (prefers-reduced-motion: reduce) {

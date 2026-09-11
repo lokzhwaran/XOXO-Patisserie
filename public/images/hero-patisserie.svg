@@ -2,8 +2,6 @@
   <title id="title">A patisserie table with brownies and cookies</title>
   <desc id="desc">A warm editorial illustration of fresh patisserie treats arranged on a table.</desc>
   <rect width="1600" height="1000" fill="#f7efe4" />
-  <circle cx="1300" cy="170" r="250" fill="#e8c1b3" opacity=".72" />
-  <circle cx="1450" cy="330" r="150" fill="#d9877f" opacity=".55" />
   <path d="M0 710h1600v290H0z" fill="#5a2b2d" />
   <path d="M0 710h1600v34H0z" fill="#7c3d3c" />
   <ellipse cx="1190" cy="720" rx="310" ry="48" fill="#3d2024" opacity=".35" />
@@ -32,9 +30,4 @@
     <circle cx="-12" cy="-10" r="6" fill="#9f5a4f" />
     <circle cx="17" cy="12" r="6" fill="#9f5a4f" />
   </g>
-  <path d="M138 220h300" stroke="#7c3d3c" stroke-width="5" opacity=".45" />
-  <path d="M138 248h180" stroke="#d9877f" stroke-width="5" opacity=".7" />
-  <circle cx="190" cy="300" r="8" fill="#d9877f" />
-  <circle cx="234" cy="300" r="8" fill="#d9877f" />
-  <circle cx="278" cy="300" r="8" fill="#d9877f" />
 </svg>
