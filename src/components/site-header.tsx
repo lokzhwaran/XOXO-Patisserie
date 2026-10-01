@@ -35,48 +35,41 @@ export function SiteHeader({ businessName, logoUrl }: { businessName: string; lo
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           isHome
-            ? "border-b border-[var(--color-border)]/80 bg-[var(--color-background)]/95 shadow-[0_8px_24px_rgba(36,24,17,0.08)] backdrop-blur-xl"
-            : "border-b border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-xl"
+            ? "border-b border-[var(--color-border)]/80 bg-[var(--color-background)]/80 shadow-[0_12px_40px_rgba(36,24,17,0.06)] backdrop-blur-xl"
+            : "border-b border-[var(--color-border)] bg-[var(--color-surface)]/85 backdrop-blur-xl"
         }`}
       >
         <div className="mx-auto flex h-16 sm:h-20 max-w-(--container-max) items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2.5 sm:gap-3">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt={businessName} className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-white/30" />
+              <img src={logoUrl} alt={businessName} className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-[var(--color-surface)] shadow-[0_8px_18px_rgba(36,24,17,0.12)]" />
             ) : (
-              <Heart
-                className="h-3.5 w-3.5 text-[var(--color-accent)]"
-                fill="currentColor"
-              />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-secondary)] text-[var(--color-accent)] shadow-sm sm:h-10 sm:w-10">
+                <Heart className="h-3.5 w-3.5" fill="currentColor" />
+              </span>
             )}
-            <span
-              className="font-heading text-base sm:text-lg tracking-wide text-[var(--color-foreground)]"
-            >
+            <span className="font-heading text-base sm:text-lg tracking-[0.02em] text-[var(--color-foreground)]">
               {businessName}
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link
-              href="/menu"
-              className="text-sm font-medium text-[var(--color-foreground)] transition-colors hover:text-[var(--color-primary)]"
-            >
-              Menu
-            </Link>
-            <Link
-              href="/track"
-              className="text-sm font-medium text-[var(--color-foreground)] transition-colors hover:text-[var(--color-primary)]"
-            >
-              Track Order
-            </Link>
-            <Button asChild variant="primary" size="md" className="shadow-sm shadow-black/10">
+          <nav className="hidden items-center gap-3 md:flex">
+            <div className="flex items-center gap-1 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/90 p-1.5 shadow-sm">
+              <Link href="/menu" className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-foreground)] transition-colors hover:bg-[var(--color-muted)]">
+                Menu
+              </Link>
+              <Link href="/track" className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-foreground)] transition-colors hover:bg-[var(--color-muted)]">
+                Track Order
+              </Link>
+            </div>
+            <Button asChild variant="primary" size="md" className="shadow-[0_12px_26px_rgba(36,24,17,0.12)]">
               <Link href="/menu">Order Now</Link>
             </Button>
             <button
               aria-label="Open cart"
               onClick={() => setCartOpen(true)}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-muted)] transition-colors hover:bg-[var(--color-secondary)]"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-muted)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[var(--color-secondary)]"
             >
               <ShoppingBag className="h-5 w-5 text-[var(--color-foreground)]" />
               {itemCount > 0 && (

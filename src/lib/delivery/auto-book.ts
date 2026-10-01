@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { porter, type DeliveryAddress } from "@/lib/delivery";
 import { getPaymentProvider } from "@/lib/providers/payments";
+import { createAlert } from "@/lib/notifications/alerts";
 import { sendWhatsAppMessage, renderTemplate, DEFAULT_WHATSAPP_TEMPLATES } from "@/lib/notifications/whatsapp";
 
 /**
@@ -85,7 +86,16 @@ export async function tryAutoBookPorterDelivery(orderId: string): Promise<boolea
     });
     await sendWhatsAppMessage({ to: order.customer.phone, body: message, relatedOrderId: order.id });
     return true;
-  } catch {
-    return false; // Booking failed — admin falls back to the manual "Arrange delivery" panel.
+  } catch (error) {
+    // Booking failed — admin falls back to the manual "Arrange delivery" panel. Surface it as an
+    // alert so a failed auto-booking is never silent and an order can't quietly stall in PACKED.
+    await createAlert({
+      type: "DELIVERY_AUTOBOOK_FAILED",
+      severity: "WARNING",
+      title: `Porter auto-booking failed for ${order.orderNumber}`,
+      body: `${(error as Error).message}. Arrange this delivery manually from the order page.`,
+      relatedOrderId: order.id,
+    }).catch(() => undefined);
+    return false;
   }
 }

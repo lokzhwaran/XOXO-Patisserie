@@ -16,22 +16,41 @@ export async function POST(request: Request, { params }: { params: Promise<{ ord
   }
 
   const provider = getPaymentProvider();
-  const rpOrder = await provider.createOrder({
-    amountPaise: order.totalPaise,
-    receipt: order.orderNumber,
-    notes: { orderId: order.id, orderNumber: order.orderNumber },
-  });
 
-  await prisma.payment.create({
-    data: {
+  // Re-opening or refreshing the payment page must not mint a new provider order every time —
+  // reuse the still-pending attempt for this order so Payment rows can't accumulate unbounded.
+  const existing = await prisma.payment.findFirst({
+    where: {
       orderId: order.id,
       purpose: "ORDER",
-      amountPaise: order.totalPaise,
-      razorpayOrderId: rpOrder.id,
       status: "PENDING",
+      amountPaise: order.totalPaise,
       isSandbox: provider.mode === "sandbox",
+      razorpayOrderId: { not: null },
     },
+    orderBy: { createdAt: "desc" },
   });
+
+  const rpOrder = existing?.razorpayOrderId
+    ? { id: existing.razorpayOrderId, amount: order.totalPaise, currency: "INR" }
+    : await provider.createOrder({
+        amountPaise: order.totalPaise,
+        receipt: order.orderNumber,
+        notes: { orderId: order.id, orderNumber: order.orderNumber },
+      });
+
+  if (!existing) {
+    await prisma.payment.create({
+      data: {
+        orderId: order.id,
+        purpose: "ORDER",
+        amountPaise: order.totalPaise,
+        razorpayOrderId: rpOrder.id,
+        status: "PENDING",
+        isSandbox: provider.mode === "sandbox",
+      },
+    });
+  }
 
   const checkoutUrl = provider.getCheckoutUrl(rpOrder, order.orderNumber);
 

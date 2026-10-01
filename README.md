@@ -55,6 +55,23 @@ pnpm db:seed                # seeds categories, 9 products, 30 days of capacity,
    password (the seed script creates a reference `AdminUser` row, but Supabase Auth is the actual
    login system — you must set the password there once).
 6. Create a public Storage bucket (e.g. `product-images`) if you'll upload photos via the admin.
+   Set `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET` to its name and `SUPABASE_SERVICE_ROLE_KEY` so the
+   admin upload endpoint can write to it.
+
+### Product photos
+
+Admin → **Menu & Inventory** manages photos per item: upload one or more images (JPG/PNG/WEBP/
+AVIF/GIF, up to 5MB each), reorder by removing and re-adding, and remove the ones you don't want.
+The first image is the one the storefront card shows, marked **Main**.
+
+Storage follows the same sandbox/live split as payments and auth:
+
+- **No Supabase configured** (default): images are written to `public/uploads/products/` and served
+  straight from the app. Zero external accounts needed — ideal for local use and a single
+  long-lived server. These files are **not** committed to git and are lost if the container is
+  rebuilt, so this is not suitable for ephemeral hosting.
+- **Supabase configured**: images are uploaded to the Storage bucket above and served from its
+  public CDN URL. This is the recommended production setup on Render/Vercel.
 
 ### Run the app
 
@@ -144,6 +161,7 @@ managed Postgres database together. The web service builds and runs from the rep
 | `pnpm db:seed` | Seed demo data |
 | `pnpm db:studio` | Open Prisma Studio |
 | `pnpm test` | Run unit/integration tests (Vitest) |
+| `pnpm test:e2e` | Run browser smoke tests (Playwright — run `npx playwright install chromium` once) |
 | `pnpm lint` | ESLint |
 
 ## 8. Project structure

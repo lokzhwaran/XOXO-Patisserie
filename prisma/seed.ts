@@ -13,8 +13,13 @@ const isMinimal = process.argv.includes("--minimal");
 const ORDER_COUNT = isMinimal ? 5 : 40;
 const EXPENSE_COUNT = isMinimal ? 3 : 20;
 const SEED_RUN_ID = `${Date.now()}`.slice(-6);
-const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || "admin@bakery.local";
-const adminPassword = process.env.ADMIN_PASSWORD || "Admin@12345";
+const isProduction = process.env.NODE_ENV === "production";
+const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase() || (isProduction ? "" : "admin@bakery.local");
+const adminPassword = process.env.ADMIN_PASSWORD || (isProduction ? "" : "Admin@12345");
+
+if (isProduction && (!adminEmail || !adminPassword)) {
+  throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD are required for production seeding");
+}
 
 const CATEGORIES = [
   { name: "Brownies", slug: "brownies", sortOrder: 0 },
@@ -428,8 +433,12 @@ async function main() {
 
   const seededAccounts = [
     { email: adminEmail, name: "Bakery Owner", role: "OWNER", password: adminPassword },
-    { email: "manager@bakery.local", name: "Store Manager", role: "MANAGER", password: "Manager@12345" },
-    { email: "staff@bakery.local", name: "Kitchen Staff", role: "STAFF", password: "Staff@12345" },
+    ...(!isProduction
+      ? [
+          { email: "manager@bakery.local", name: "Store Manager", role: "MANAGER", password: "Manager@12345" },
+          { email: "staff@bakery.local", name: "Kitchen Staff", role: "STAFF", password: "Staff@12345" },
+        ]
+      : []),
   ];
   for (const acc of seededAccounts) {
     const passwordHash = await hashPassword(acc.password);

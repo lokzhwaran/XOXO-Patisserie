@@ -1,22 +1,15 @@
 #!/bin/sh
 set -e
 
-# Generate a default SESSION_SECRET if not supplied so auth doesn't fail
-if [ -z "$SESSION_SECRET" ]; then
-  export SESSION_SECRET="xoxo-patisserie-prod-secret-$(hostname 2>/dev/null || echo render)-$(date +%s)"
-fi
-
-# Default APP_MODE to sandbox if not provided
-if [ -z "$APP_MODE" ]; then
-  export APP_MODE="sandbox"
-fi
-
-# Default admin credentials if not set
-if [ -z "$ADMIN_EMAIL" ]; then
-  export ADMIN_EMAIL="admin@bakery.local"
-fi
-if [ -z "$ADMIN_PASSWORD" ]; then
-  export ADMIN_PASSWORD="Admin@12345"
+if [ "${NODE_ENV:-development}" = "production" ]; then
+  : "${SESSION_SECRET:?SESSION_SECRET must be configured in production}"
+  : "${APP_MODE:?APP_MODE must be configured in production}"
+  : "${ADMIN_EMAIL:?ADMIN_EMAIL must be configured in production}"
+  : "${ADMIN_PASSWORD:?ADMIN_PASSWORD must be configured in production}"
+else
+  export APP_MODE="${APP_MODE:-sandbox}"
+  export ADMIN_EMAIL="${ADMIN_EMAIL:-admin@bakery.local}"
+  export ADMIN_PASSWORD="${ADMIN_PASSWORD:-Admin@12345}"
 fi
 
 # Check if external DATABASE_URL was provided
@@ -60,11 +53,16 @@ fi
 
 # Sync database schema with Prisma
 echo "[docker] Syncing Prisma database schema..."
-pnpm prisma db push --skip-generate --accept-data-loss || true
+pnpm prisma db push --skip-generate --accept-data-loss
 
-# Seed default data and admin credentials
-echo "[docker] Seeding database..."
-pnpm tsx prisma/seed.ts || true
+# Seed only when explicitly requested. Production deployments should seed once as an operational
+# step, not reset credentials and create demo accounts on every container restart.
+if [ "${SEED_DATABASE:-false}" = "true" ]; then
+  echo "[docker] Seeding database..."
+  pnpm tsx prisma/seed.ts
+else
+  echo "[docker] Skipping database seed (set SEED_DATABASE=true for an explicit bootstrap)."
+fi
 
 # Cleanup trap
 cleanup() {

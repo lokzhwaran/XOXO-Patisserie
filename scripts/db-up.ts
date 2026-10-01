@@ -27,8 +27,34 @@ function isPortOpen(port: number): Promise<boolean> {
   });
 }
 
+/**
+ * Some environments (hardened sandboxes, restrictive firewalls) refuse loopback TCP while the
+ * server's unix socket still works. Postgres always exposes /tmp/.s.PGSQL.<port>, so probing it
+ * lets an already-running local server be reused instead of being reported as unreachable.
+ */
+function isUnixSocketOpen(port: number): Promise<boolean> {
+  const socketPath = path.join("/tmp", `.s.PGSQL.${port}`);
+  if (!existsSync(socketPath)) return Promise.resolve(false);
+  return new Promise((resolve) => {
+    const socket = net.createConnection(socketPath);
+    socket.once("connect", () => {
+      socket.destroy();
+      resolve(true);
+    });
+    socket.once("error", () => resolve(false));
+    socket.setTimeout(1000, () => {
+      socket.destroy();
+      resolve(false);
+    });
+  });
+}
+
 export function embeddedUrl(port = DEFAULT_PORT): string {
   return `postgresql://postgres:postgres@127.0.0.1:${port}/xoxobakery`;
+}
+
+export function embeddedSocketUrl(port = DEFAULT_PORT): string {
+  return `postgresql://postgres:postgres@localhost:${port}/xoxobakery?host=/tmp`;
 }
 
 /** Starts Postgres for local development: docker-compose if Docker is available and running,
@@ -40,11 +66,20 @@ export async function ensureDatabaseRunning(): Promise<{ databaseUrl: string; vi
     if (await isPortOpen(port)) {
       return { databaseUrl: process.env.DATABASE_URL, via: "existing" };
     }
+    if (await isUnixSocketOpen(port)) {
+      console.log(`[db] Loopback TCP on ${port} is unavailable, but the Postgres unix socket is — using it.`);
+      return { databaseUrl: embeddedSocketUrl(port), via: "existing" };
+    }
     console.log(`[db] DATABASE_URL is set but nothing is listening on port ${port} yet — starting a database.`);
   }
 
   if (await isPortOpen(5432)) {
     return { databaseUrl: "postgresql://xoxobakery:xoxobakery@localhost:5432/xoxobakery", via: "existing" };
+  }
+
+  if (await isUnixSocketOpen(DEFAULT_PORT)) {
+    console.log(`[db] Reusing the running embedded Postgres via its unix socket on port ${DEFAULT_PORT}.`);
+    return { databaseUrl: embeddedSocketUrl(DEFAULT_PORT), via: "existing" };
   }
 
   if (dockerAvailable()) {

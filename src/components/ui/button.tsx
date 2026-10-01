@@ -9,16 +9,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-[var(--radius-base)]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]/25 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 rounded-[var(--radius-base)] shadow-[0_10px_24px_rgba(36,24,17,0.08)]",
   {
     variants: {
       variant: {
-        primary: "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] hover:opacity-90",
-        secondary: "bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:opacity-90",
-        outline: "border border-[var(--color-border)] bg-transparent hover:bg-[var(--color-muted)]",
-        ghost: "bg-transparent hover:bg-[var(--color-muted)]",
-        danger: "bg-[var(--color-danger)] text-white hover:opacity-90",
-        link: "underline-offset-4 hover:underline text-[var(--color-foreground)]",
+        primary: "bg-[linear-gradient(135deg,var(--color-primary),var(--color-accent))] text-[var(--color-primary-foreground)] hover:-translate-y-0.5 hover:shadow-[0_16px_32px_rgba(36,24,17,0.14)]",
+        secondary: "bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] hover:-translate-y-0.5 hover:opacity-95",
+        outline: "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] hover:-translate-y-0.5 hover:bg-[var(--color-muted)]",
+        ghost: "bg-transparent text-[var(--color-foreground)] hover:bg-[var(--color-muted)]",
+        danger: "bg-[var(--color-danger)] text-white hover:-translate-y-0.5 hover:opacity-95",
+        link: "underline-offset-4 hover:underline text-[var(--color-foreground)] shadow-none",
       },
       size: {
         sm: "h-9 px-3",

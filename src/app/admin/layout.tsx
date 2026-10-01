@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 // header/footer/WhatsApp button that (site) uses — it is its own application shell.
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased">
       <body className="min-h-full bg-[var(--color-muted)] text-[var(--color-foreground)]">
         {children}
         <Toaster position="top-center" richColors />

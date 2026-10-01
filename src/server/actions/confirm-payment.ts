@@ -22,7 +22,13 @@ export async function confirmOrderPaid(params: {
     return { alreadyProcessed: true };
   }
 
-  await prisma.$transaction(async (tx) => {
+  const claimed = await prisma.$transaction(async (tx) => {
+    const result = await tx.order.updateMany({
+      where: { id: order.id, paymentStatus: { not: "PAID" } },
+      data: { paymentStatus: "PAID", status: "CONFIRMED" },
+    });
+    if (result.count === 0) return false;
+
     await tx.payment.updateMany({
       where: { orderId: order.id, razorpayOrderId: params.razorpayOrderId },
       data: {
@@ -32,14 +38,13 @@ export async function confirmOrderPaid(params: {
         status: "PAID",
       },
     });
-    await tx.order.update({
-      where: { id: order.id },
-      data: { paymentStatus: "PAID", status: "CONFIRMED" },
-    });
     await tx.orderStatusEvent.create({
       data: { orderId: order.id, fromStatus: order.status, toStatus: "CONFIRMED", actor: "SYSTEM", note: "Payment confirmed" },
     });
+    return true;
   });
+
+  if (!claimed) return { alreadyProcessed: true };
 
   await convertReservedToSold(
     order.items.map((i) => ({ productId: i.productId, quantity: i.quantity })),

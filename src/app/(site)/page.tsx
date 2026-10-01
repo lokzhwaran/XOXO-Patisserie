@@ -23,6 +23,9 @@ export default async function HomePage() {
   return (
     <div className="pb-16">
       <section className="homepage-hero relative isolate flex min-h-[calc(100svh-5rem)] w-full items-center overflow-hidden bg-[var(--color-background)]">
+        <div className="bg-orb left-[-8%] top-[8%] h-56 w-56 bg-[var(--color-accent)]/30" />
+        <div className="bg-orb right-[8%] top-[18%] h-72 w-72 bg-[var(--color-secondary)]/70" />
+        <div className="bg-orb bottom-[8%] left-[25%] h-72 w-72 bg-[var(--color-warning)]/25" />
         <Image
           src={heroImageUrl}
           alt="Freshly baked brownies and cookies from XOXO Patisserie"
@@ -31,13 +34,13 @@ export default async function HomePage() {
           sizes="100vw"
           className="object-cover object-right md:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-background)] via-[var(--color-background)]/85 to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(249,244,239,0.96)_0%,rgba(249,244,239,0.88)_32%,rgba(249,244,239,0.45)_62%,rgba(249,244,239,0)_100%)]" />
         <div className="homepage-hero-content relative z-10 mx-auto w-full max-w-(--container-max) px-4 py-12 sm:px-6 sm:py-28 lg:px-8">
           <div className="max-w-2xl text-[var(--color-foreground)]">
-            <span className="eyebrow border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)]">
+            <span className="eyebrow border-[var(--color-border)] bg-[var(--color-surface)]/80 text-[var(--color-foreground)] shadow-[0_14px_36px_rgba(36,24,17,0.05)] backdrop-blur-sm">
               XOXO Patisserie · Chennai
             </span>
-            <h1 className="mt-4 sm:mt-6 max-w-xl font-heading text-4xl sm:text-6xl lg:text-7xl leading-[1.05] sm:leading-[0.98]">{settings.heroHeading}</h1>
+            <h1 className="mt-4 sm:mt-6 max-w-xl font-heading text-4xl sm:text-6xl lg:text-7xl leading-[1.02] tracking-[-0.05em] sm:leading-[0.94]">{settings.heroHeading}</h1>
             <p className="mt-4 sm:mt-6 max-w-xl text-sm leading-relaxed text-[var(--color-muted-foreground)] sm:text-lg">{settings.heroSubheading}</p>
             <div className="mt-6 sm:mt-8 flex flex-col items-stretch sm:items-center justify-start gap-3 sm:gap-4 sm:flex-row">
               <HeroOrderButton
@@ -47,7 +50,7 @@ export default async function HomePage() {
                 nextAvailableMessage={settings.nextAvailableMessage}
                 whatsappNumber={settings.whatsappNumber}
               />
-              <Button asChild variant="outline" size="lg" className="bg-[var(--color-surface)] w-full sm:w-auto">
+              <Button asChild variant="outline" size="lg" className="w-full bg-[var(--color-surface)]/85 backdrop-blur-sm sm:w-auto">
                 <Link href="/menu">Browse Menu</Link>
               </Button>
             </div>
@@ -57,8 +60,8 @@ export default async function HomePage() {
                 { label: "Delivery", value: "Chennai" },
                 { label: "Freshness", value: "24h" },
               ].map((item) => (
-                <div key={item.label} className="rounded-xl sm:rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2.5 sm:p-4 shadow-xs">
-                  <div className="text-[10px] sm:text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]">{item.label}</div>
+                <div key={item.label} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)]/85 p-2.5 shadow-[0_14px_30px_rgba(36,24,17,0.04)] backdrop-blur-sm sm:p-4">
+                  <div className="text-[10px] sm:text-xs uppercase tracking-[0.18em] text-[var(--color-muted-foreground)]">{item.label}</div>
                   <div className="mt-1 font-heading text-sm sm:text-xl text-[var(--color-foreground)] font-semibold">{item.value}</div>
                 </div>
               ))}

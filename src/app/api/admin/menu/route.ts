@@ -3,12 +3,23 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getAuthProvider, SESSION_COOKIE_NAME } from "@/lib/providers/auth";
+import { deleteProductImage, normalizeImageUrl } from "@/lib/storage";
 
 async function isAuthenticated() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   return Boolean(token && await getAuthProvider().verifySession(token));
 }
+
+/** Accepts an images array from the admin editor, dropping anything unsafe or non-renderable. */
+function parseImages(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map(normalizeImageUrl)
+    .filter((url): url is string => Boolean(url))
+    .slice(0, 6);
+}
+
 
 export async function POST(request: Request) {
   if (!await isAuthenticated()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,7 +35,7 @@ export async function POST(request: Request) {
   }
   const slug = `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${String(body.code).toLowerCase()}`;
   try {
-    const product = await prisma.product.create({ data: { name, code: String(body.code).trim().toUpperCase(), slug, categoryId, description: String(body.description ?? "").trim() || name, ingredients: String(body.ingredients ?? "").trim() || "Please ask us about ingredients.", isVeg: Boolean(body.isVeg), sellingPricePaise, costOfMakingPaise, weightGrams: Math.max(0, Math.floor(Number(body.weightGrams) || 0)), isFeatured: Boolean(body.isFeatured), images: [] } });
+    const product = await prisma.product.create({ data: { name, code: String(body.code).trim().toUpperCase(), slug, categoryId, description: String(body.description ?? "").trim() || name, ingredients: String(body.ingredients ?? "").trim() || "Please ask us about ingredients.", isVeg: Boolean(body.isVeg), sellingPricePaise, costOfMakingPaise, weightGrams: Math.max(0, Math.floor(Number(body.weightGrams) || 0)), isFeatured: Boolean(body.isFeatured), images: parseImages(body.images) } });
     await prisma.capacityDefault.create({ data: { productId: product.id, weekdayMax, weekendMax } });
   } catch {
     return NextResponse.json({ error: "Product code or name already exists" }, { status: 409 });
@@ -42,6 +53,12 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Enter a product name, category, prices, and non-negative capacity limits" }, { status: 400 });
   }
 
+  const existing = await prisma.product.findUnique({ where: { id: body.productId } });
+  if (!existing) return NextResponse.json({ error: "Menu item not found" }, { status: 404 });
+
+  // Only overwrite optional descriptive fields when the client actually sent them, so a partial
+  // payload (e.g. an inline price edit) can never blank out copy the admin entered elsewhere.
+  const images = body.images === undefined ? existing.images : parseImages(body.images);
   const product = await prisma.product.update({
     where: { id: body.productId },
     data: {
@@ -51,8 +68,20 @@ export async function PATCH(request: Request) {
       costOfMakingPaise: Math.max(0, Math.round(Number(body.costOfMakingRupees) * 100)),
       isActive: Boolean(body.isActive),
       isFeatured: Boolean(body.isFeatured),
+      images,
+      ...(body.description !== undefined ? { description: String(body.description).trim() || existing.description } : {}),
+      ...(body.ingredients !== undefined ? { ingredients: String(body.ingredients).trim() || existing.ingredients } : {}),
+      ...(body.isVeg !== undefined ? { isVeg: Boolean(body.isVeg) } : {}),
+      ...(body.weightGrams !== undefined && Number.isFinite(Number(body.weightGrams))
+        ? { weightGrams: Math.max(0, Math.floor(Number(body.weightGrams))) }
+        : {}),
     },
   });
+
+  // Reclaim storage for images the admin removed in this save.
+  for (const removed of existing.images.filter((url) => !images.includes(url))) {
+    await deleteProductImage(removed);
+  }
 
   const weekdayMax = Math.max(0, Math.floor(Number(body.weekdayMax)));
   const weekendMax = Math.max(0, Math.floor(Number(body.weekendMax)));

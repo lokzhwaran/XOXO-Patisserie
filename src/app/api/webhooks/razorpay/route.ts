@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPaymentProvider } from "@/lib/providers/payments";
 import { confirmOrderPaid } from "@/server/actions/confirm-payment";
-import { releaseReservedCapacity } from "@/lib/capacity";
+import { releaseSoldCapacity } from "@/lib/capacity";
 
 /**
  * Razorpay webhook — the source of truth for payment state (payment.captured, payment.failed,
@@ -21,17 +21,22 @@ export async function POST(request: Request) {
   const event = JSON.parse(rawBody);
   const eventId: string | undefined = event.id;
 
-  if (eventId) {
-    const already = await prisma.webhookEvent.findUnique({ where: { id: eventId } });
-    if (already) {
-      return NextResponse.json({ success: true, idempotent: true });
-    }
-    await prisma.webhookEvent.create({
-      data: { id: eventId, provider: "razorpay", eventType: event.event },
-    });
-  }
-
   try {
+    if (eventId) {
+      const already = await prisma.webhookEvent.findUnique({ where: { id: eventId } });
+      if (already) {
+        return NextResponse.json({ success: true, idempotent: true });
+      }
+      try {
+        await prisma.webhookEvent.create({
+          data: { id: eventId, provider: "razorpay", eventType: event.event },
+        });
+      } catch (error) {
+        if ((error as { code?: string }).code !== "P2002") throw error;
+        return NextResponse.json({ success: true, idempotent: true });
+      }
+    }
+
     if (event.event === "payment.captured") {
       const payment = event.payload.payment.entity;
       const rpOrderId = payment.order_id;
@@ -64,11 +69,15 @@ export async function POST(request: Request) {
       if (payment) {
         const order = await prisma.order.findUnique({ where: { id: payment.orderId }, include: { items: true } });
         if (order) {
-          await prisma.order.update({ where: { id: order.id }, data: { status: "REFUNDED", paymentStatus: "REFUNDED" } });
+          const claimed = await prisma.order.updateMany({
+            where: { id: order.id, paymentStatus: { not: "REFUNDED" } },
+            data: { status: "REFUNDED", paymentStatus: "REFUNDED" },
+          });
+          if (claimed.count === 0) return NextResponse.json({ success: true, idempotent: true });
           await prisma.orderStatusEvent.create({
             data: { orderId: order.id, fromStatus: order.status, toStatus: "REFUNDED", actor: "SYSTEM", note: "Refund processed" },
           });
-          await releaseReservedCapacity(
+          await releaseSoldCapacity(
             order.items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
             order.requestedDate
           );
@@ -77,6 +86,9 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     console.error("Webhook processing error", err);
+    if (eventId) {
+      await prisma.webhookEvent.deleteMany({ where: { id: eventId } });
+    }
     return NextResponse.json({ error: "Processing failed" }, { status: 500 });
   }
 

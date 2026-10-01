@@ -29,6 +29,10 @@ export default async function AdminMenuPage() {
           weekendMax: p.capacityDefault?.weekendMax ?? 0,
           isActive: p.isActive,
           isFeatured: p.isFeatured,
+          images: p.images,
+          description: p.description,
+          weightGrams: p.weightGrams,
+          isVeg: p.isVeg,
           hasOrders: p._count.orderItems > 0,
         }))}
         categories={categories}

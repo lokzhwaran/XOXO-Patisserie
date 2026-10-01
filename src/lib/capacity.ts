@@ -115,13 +115,14 @@ export async function convertReservedToSold(
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
       const row = await ensureDailyCapacity(tx, item.productId, date);
-      await tx.dailyCapacity.update({
-        where: { id: row.id },
-        data: {
-          reservedQuantity: { decrement: item.quantity },
-          soldQuantity: { increment: item.quantity },
-        },
-      });
+      // GREATEST(0, ...) keeps the counter from going negative if this order never actually held
+      // a reservation (e.g. imported/seeded rows) — a negative reserved count would inflate
+      // `available` above maxQuantity and let the bakery oversell a day it can't bake for.
+      await tx.$executeRaw`
+        UPDATE "DailyCapacity"
+           SET "reservedQuantity" = GREATEST(0, "reservedQuantity" - ${item.quantity}),
+               "soldQuantity"     = "soldQuantity" + ${item.quantity}
+         WHERE id = ${row.id}`;
     }
   });
 }
@@ -134,10 +135,10 @@ export async function releaseReservedCapacity(
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
       const row = await ensureDailyCapacity(tx, item.productId, date);
-      await tx.dailyCapacity.update({
-        where: { id: row.id },
-        data: { reservedQuantity: { decrement: item.quantity } },
-      });
+      await tx.$executeRaw`
+        UPDATE "DailyCapacity"
+           SET "reservedQuantity" = GREATEST(0, "reservedQuantity" - ${item.quantity})
+         WHERE id = ${row.id}`;
     }
   });
 }
@@ -151,10 +152,10 @@ export async function releaseSoldCapacity(
   await prisma.$transaction(async (tx) => {
     for (const item of items) {
       const row = await ensureDailyCapacity(tx, item.productId, date);
-      await tx.dailyCapacity.update({
-        where: { id: row.id },
-        data: { soldQuantity: { decrement: item.quantity } },
-      });
+      await tx.$executeRaw`
+        UPDATE "DailyCapacity"
+           SET "soldQuantity" = GREATEST(0, "soldQuantity" - ${item.quantity})
+         WHERE id = ${row.id}`;
     }
   });
 }

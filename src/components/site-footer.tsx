@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Instagram, Facebook, MapPin, Phone } from "lucide-react";
 import type { SiteSettings } from "@prisma/client";
+import { APP_VERSION_LABEL } from "@/lib/version";
 
 export function SiteFooter({ settings }: { settings: SiteSettings }) {
   return (
@@ -57,9 +58,14 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
             </ul>
           </div>
         </div>
-        <p className="mt-8 sm:mt-12 text-xs text-[var(--color-muted-foreground)] border-t border-[var(--color-border)]/60 pt-6">
-          © {new Date().getFullYear()} {settings.businessName}. All rights reserved.
-        </p>
+        <div className="mt-8 flex flex-col gap-3 border-t border-[var(--color-border)]/60 pt-6 sm:mt-12 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-[var(--color-muted-foreground)]">
+            © {new Date().getFullYear()} {settings.businessName}. All rights reserved.
+          </p>
+          <span className="inline-flex w-fit items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--color-foreground)] shadow-sm">
+            {APP_VERSION_LABEL}
+          </span>
+        </div>
       </div>
     </footer>
   );
